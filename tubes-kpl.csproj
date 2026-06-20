@@ -10,4 +10,8 @@
     <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Components\Layout\" />
+  </ItemGroup>
+
 </Project>
