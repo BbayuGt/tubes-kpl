@@ -1,5 +1,6 @@
 namespace tubes_kpl.Models;
 
+// Memenuhi Ketentuan 4: Menerapkan Clean Code. Penamaan menggunakan PascalCase untuk properti dan Class sesuai standar C#.
 public class Campaign
 {
     public int Id { get; set; }

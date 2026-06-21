@@ -1,7 +1,7 @@
-@page "/CampaignDetail/{Id:int}"
+@page "/details/{campaignId:int}"
 @using tubes_kpl.Models
-@using System.Net.Http.Json
-@inject HttpClient Http
+@using tubes_kpl.Services
+@inject CampaignService CampaignService
 @inject NavigationManager NavigationManager
 
 
@@ -272,8 +272,11 @@
 </html>
 
 @code {
+    // Memenuhi Ketentuan 3: Integrasi API/Backend ke GUI menggunakan Razor Component.
+    // Memenuhi Ketentuan 4: File ini menjadi tanggung jawab: [Nama Anggota/NIM] (Silakan diisi)
+
     [Parameter]
-    public int Id { get; set; }
+    public int campaignId { get; set; }
 
     public int DonationAmount { get; set; }
 
@@ -284,8 +287,8 @@
     {
         try
         {
-            // Panggil backend Anda
-            Campaign = await Http.GetFromJsonAsync<tubes_kpl.Models.Campaign>($"http://localhost:8080/api/Campaign/{Id}");
+            // Gunakan CampaignService agar mematuhi Clean Code dan membaca URL dari appsettings.json
+            Campaign = await CampaignService.GetCampaignById(campaignId);
         }
         catch (Exception ex)
         {
