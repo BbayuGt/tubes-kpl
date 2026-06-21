@@ -148,18 +148,18 @@ else
 </main>
 <AppFooter />
 @code {
-    private List<Campaign>? campaigns;
+    private List<Models.Campaign>? campaigns;
 
     protected override async Task OnInitializedAsync()
     {
         var client = HttpClientFactory.CreateClient("BackendAPI");
         try
         {
-            campaigns = await client.GetFromJsonAsync<List<Campaign>>("api/Campaign");
+            campaigns = await client.GetFromJsonAsync<List<Models.Campaign>>("api/Campaign");
         }
         catch
         {
-            campaigns = new List<Campaign>();
+            campaigns = new List<Models.Campaign>();
         }
     }
 }
