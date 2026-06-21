@@ -7,16 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-var backendUrl = builder.Configuration["BackendUrl"]
-    ?? "http://localhost:8080/";
-
+var backendUrl = builder.Configuration["BackendUrl"] ?? throw new InvalidOperationException("BackendUrl is not configured.");
 builder.Services.AddHttpClient("BackendAPI", client =>
 {
     client.BaseAddress = new Uri(backendUrl);
 });
-
-// Register Services
-builder.Services.AddScoped<CampaignService>();
 
 var app = builder.Build();
 
