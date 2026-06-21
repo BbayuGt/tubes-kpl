@@ -3,23 +3,12 @@
 @inject IHttpClientFactory HttpClientFactory
 @inject NavigationManager NavigationManager
 
-<!DOCTYPE html>
-
-<html class="light" lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Register - HumanityFlow</title>
+<HeadContent>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet"/>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -167,8 +156,11 @@
             color: #0056b3;
         }
     </style>
-</head>
-<body class="min-h-screen flex flex-col antialiased">
+</HeadContent>
+
+<PageTitle>Register - HumanityFlow</PageTitle>
+
+<div class="min-h-screen flex flex-col antialiased">
 <!-- TopNavBar (Transactional - Suppressed regular nav items as per rule for Sign-up) -->
 <nav class="bg-surface-container-lowest w-full shadow-sm z-50">
     <div class="flex justify-between items-center w-full px-base md:px-margin-desktop max-w-container-max mx-auto h-20">
@@ -213,7 +205,7 @@
                         today.</p>
                 </div>
                 <!-- Form -->
-                <form @onsubmit="HandleRegister" class="flex flex-col gap-5">
+                <EditForm Model="this" OnValidSubmit="HandleRegister" FormName="registerForm" class="flex flex-col gap-5">
                     @if (!string.IsNullOrEmpty(errorMessage))
                     {
                         <div class="bg-error-container text-on-error-container p-3 rounded text-sm mb-2">
@@ -285,7 +277,7 @@
                         Create Account
                         <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
                     </button>
-                </form>
+                </EditForm>
             </div>
         </div>
     </div>
@@ -333,5 +325,4 @@
         }
     }
 }
-</body>
-</html>
+</div>
