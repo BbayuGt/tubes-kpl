@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddHttpClient();
 
 var backendUrl = builder.Configuration["BackendUrl"] ?? throw new InvalidOperationException("BackendUrl is not configured.");
 
