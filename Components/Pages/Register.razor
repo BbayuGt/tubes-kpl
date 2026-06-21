@@ -290,12 +290,25 @@
     </div>
 </footer>
 
+@inject IJSRuntime JSRuntime
 @code {
     private string firstName = "";
     private string email = "";
     private string password = "";
     private string? errorMessage;
     private bool isSuccess;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                NavigationManager.NavigateTo("/", true);
+            }
+        }
+    }
 
     private async Task HandleRegister()
     {
