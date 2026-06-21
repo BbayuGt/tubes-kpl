@@ -1,0 +1,404 @@
+@page "/penyelenggara/dashboard/editdetail/{Id:int}"
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<HeadContent>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Edit Campaign | KindCapital</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+        darkMode: "class",
+        theme: {
+        extend: {
+        "colors": {
+        "on-tertiary-fixed-variant": "#7b2f00",
+        "on-secondary-fixed": "#151c22",
+        "tertiary-fixed-dim": "#ffb694",
+        "secondary-fixed-dim": "#c0c7cf",
+        "on-secondary": "#ffffff",
+        "on-primary-fixed-variant": "#004491",
+        "surface-container": "#e6eff8",
+        "surface": "#f6faff",
+        "tertiary-fixed": "#ffdbcc",
+        "surface-container-low": "#ecf5fe",
+        "primary-fixed": "#d7e2ff",
+        "inverse-on-surface": "#e9f2fb",
+        "primary-fixed-dim": "#acc7ff",
+        "primary": "#003f87",
+        "on-primary": "#ffffff",
+        "on-surface": "#141d23",
+        "on-error": "#ffffff",
+        "surface-container-highest": "#dbe4ed",
+        "error": "#ba1a1a",
+        "primary-container": "#0056b3",
+        "surface-tint": "#115cb9",
+        "on-primary-fixed": "#001a40",
+        "secondary": "#585f66",
+        "outline": "#727784",
+        "secondary-fixed": "#dce3eb",
+        "tertiary-container": "#983c00",
+        "surface-container-high": "#e0e9f2",
+        "secondary-container": "#dce3eb",
+        "inverse-primary": "#acc7ff",
+        "on-tertiary": "#ffffff",
+        "surface-dim": "#d2dbe4",
+        "outline-variant": "#c2c6d4",
+        "surface-variant": "#dbe4ed",
+        "on-secondary-container": "#5e656c",
+        "surface-container-lowest": "#ffffff",
+        "on-tertiary-container": "#ffc2a7",
+        "on-surface-variant": "#424752",
+        "on-secondary-fixed-variant": "#40484e",
+        "on-primary-container": "#bbd0ff",
+        "on-error-container": "#93000a",
+        "on-background": "#141d23",
+        "error-container": "#ffdad6",
+        "background": "#f6faff",
+        "tertiary": "#722b00",
+        "surface-bright": "#f6faff",
+        "on-tertiary-fixed": "#351000",
+        "inverse-surface": "#293138"
+        },
+        "borderRadius": {
+        "DEFAULT": "0.25rem",
+        "lg": "0.5rem",
+        "xl": "0.75rem",
+        "full": "9999px"
+        },
+        "spacing": {
+        "stack-sm": "12px",
+        "stack-lg": "48px",
+        "container-padding": "24px",
+        "base": "8px",
+        "stack-md": "24px",
+        "gutter": "16px"
+        },
+        "fontFamily": {
+        "label-md": ["Plus Jakarta Sans"],
+        "headline-xl": ["Plus Jakarta Sans"],
+        "body-lg": ["Plus Jakarta Sans"],
+        "headline-lg-mobile": ["Plus Jakarta Sans"],
+        "body-md": ["Plus Jakarta Sans"],
+        "headline-md": ["Plus Jakarta Sans"],
+        "headline-lg": ["Plus Jakarta Sans"]
+        },
+        "fontSize": {
+        "label-md": ["12px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500"}],
+        "headline-xl": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+        "headline-lg-mobile": ["20px", {"lineHeight": "1.3", "fontWeight": "700"}],
+        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+        "headline-md": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}],
+        "headline-lg": ["24px", {"lineHeight": "1.3", "fontWeight": "700"}]
+        }
+        },
+        },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        body {
+        background-color: #f6faff;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .sidebar-transition {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</HeadContent>
+<div class="bg-background text-on-background min-h-screen">
+    <!-- SideNavBar Component -->
+    <aside class="sidebar-transition h-screen w-64 fixed left-0 top-0 bg-surface-container-low border-r border-outline-variant flex flex-col p-4 gap-4 z-50">
+        <div class="flex flex-col gap-1 mb-8 px-4">
+            <span class="font-headline-md text-headline-md font-bold text-primary">KindCapital</span>
+            <span class="font-label-md text-label-md text-on-surface-variant">Organizer Portal</span>
+        </div>
+        <nav class="flex flex-col gap-2">
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md text-body-md" href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg font-semibold font-body-md text-body-md" href="#">
+                <span class="material-symbols-outlined">volunteer_activism</span>
+                Campaigns
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md text-body-md" href="#">
+                <span class="material-symbols-outlined">payments</span>
+                Donations
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md text-body-md" href="#">
+                <span class="material-symbols-outlined">insert_chart</span>
+                Reports
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-colors rounded-lg font-body-md text-body-md" href="#">
+                <span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+        </nav>
+    </aside>
+    <!-- TopNavBar Component -->
+    <header class="h-16 w-[calc(100%-16rem)] ml-64 sticky top-0 z-40 bg-surface border-b border-outline-variant flex justify-between items-center px-6">
+        <div class="flex items-center flex-1 max-w-xl">
+            <div class="relative w-full group">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+                <input class="w-full bg-surface-container-low border border-outline-variant rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/10 font-body-md text-body-md" placeholder="Search campaigns or donors..." type="text" />
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors text-on-surface-variant">
+                <span class="material-symbols-outlined">notifications</span>
+            </button>
+            <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors text-on-surface-variant">
+                <span class="material-symbols-outlined">settings</span>
+            </button>
+        </div>
+    </header>
+    <!-- Main Content Canvas -->
+    <main class="ml-64 p-8 min-h-[calc(100vh-4rem)]">
+        <div class="max-w-5xl mx-auto">
+            <!-- Header Section -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <nav class="flex items-center gap-2 text-on-surface-variant mb-2">
+                        <a class="font-label-md text-label-md hover:text-primary" href="#">Campaigns</a>
+                        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                        <span class="font-label-md text-label-md text-primary">Edit Campaign</span>
+                    </nav>
+                    <h1 class="font-headline-xl text-headline-xl text-on-surface">Edit Campaign</h1>
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="mt-4 p-4 bg-error-container text-on-error-container rounded-lg font-body-md font-bold">
+                            @errorMessage
+                        </div>
+                    }
+                </div>
+                <div class="flex gap-3">
+                    <button class="px-6 py-2 border border-outline text-primary rounded-md font-body-md text-body-md hover:bg-primary/5 transition-colors">
+                        Preview
+                    </button>
+                    <button @onclick="UpdateCampaign" disabled="@isSubmitting" class="px-6 py-2 bg-primary text-on-primary rounded-md font-body-md text-body-md shadow-sm hover:bg-primary-container transition-all disabled:opacity-50">
+                        @(isSubmitting ? "Updating..." : "Update Campaign")
+                    </button>
+                </div>
+            </div>
+            <!-- Bento Grid Layout for Campaign Editing -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Main Form Column (Left 2/3) -->
+                <div class="md:col-span-2 space-y-6">
+                    <!-- General Information Card -->
+                    <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
+                        <div class="flex items-center gap-2 mb-6 text-primary">
+                            <span class="material-symbols-outlined">edit_note</span>
+                            <h2 class="font-headline-md text-headline-md">General Information</h2>
+                        </div>
+                        <div class="space-y-6">
+                            @if (campaign != null)
+                            {
+                                <div>
+                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-2">Campaign Title (Immutable)</label>
+                                    <div class="relative">
+                                        <input class="w-full bg-surface-container border border-outline-variant rounded-lg py-3 px-4 font-body-md text-body-md text-on-surface-variant cursor-not-allowed" readonly="" type="text" value="@campaign.Title" />
+                                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant">lock</span>
+                                    </div>
+                                    <p class="mt-2 font-label-md text-[11px] text-on-surface-variant">Campaign titles cannot be changed once active to maintain financial audit integrity.</p>
+                                </div>
+                                <div>
+                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-2">Short Description</label>
+                                    <textarea @bind="campaign.Description" class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3 px-4 font-body-md text-body-md focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" rows="3"></textarea>
+                                </div>
+                            }
+                        </div>
+                    </section>
+                    <!-- Media Assets Card -->
+                    <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
+                        <div class="flex items-center gap-2 mb-6 text-primary">
+                            <span class="material-symbols-outlined">image</span>
+                            <h2 class="font-headline-md text-headline-md">Campaign Media</h2>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="relative group aspect-video rounded-lg overflow-hidden border border-outline-variant">
+                                <img class="w-full h-full object-cover" data-alt="A heart-warming photograph of diverse group of school children in a rural classroom setting, holding up new backpacks and stationery kits. The lighting is bright and optimistic, with a focus on their joyful expressions. The colors are vibrant yet naturally graded, fitting a modern humanitarian aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6NZ2rr00OA8DbPKZ6Qy26wpBufkLczgpTygzvP-JMaPfR4_SjFewSxF6uXpmlzW06ApBLOnJYJ4eFpEwuSn_QvDsMX5jom6tbs9f-mDXIRCFcv67e6IGKIkR64PV9KzB1_1PXYdnNSCR_du8xywbZgTpwHLvF5LNUU4mCvHA1HRShGUAiVx_vITN6UYp3aF1sK4ooZul98PzO-EK5wcajMw6dXDGtMPK6jLQAUmCKZYgqBCeavi0Qw2Ktv0r0inmu6WiHf8EEaVM9" />
+                                <div class="absolute inset-0 bg-on-surface/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                    <button class="bg-surface text-primary p-2 rounded-full shadow-lg">
+                                        <span class="material-symbols-outlined">cached</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <button class="aspect-video rounded-lg border-2 border-dashed border-outline-variant flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                                <span class="material-symbols-outlined text-3xl mb-2">add_a_photo</span>
+                                <span class="font-label-md text-label-md">Add Gallery Image</span>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+                <!-- Summary & Goals Column (Right 1/3) -->
+                <div class="space-y-6">
+                    <!-- Goal Card -->
+                    <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
+                        <div class="flex items-center gap-2 mb-6 text-primary">
+                            <span class="material-symbols-outlined">track_changes</span>
+                            <h2 class="font-headline-md text-headline-md">Fundraising Goal</h2>
+                        </div>
+                        <div class="space-y-4">
+                            @if (campaign != null)
+                            {
+                                <div>
+                                    <label class="block font-label-md text-label-md text-on-surface-variant mb-2">Goal Amount </label>
+                                    <div class="relative">
+                                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-body-md">Rp</span>
+                                        <input @bind="campaign.TargetAmount" class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3 pl-12 pr-4 font-body-md text-body-md focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none transition-all" type="number" />
+                                    </div>
+                                </div>
+                                <div class="pt-4 border-t border-outline-variant">
+                                    @{
+                                        var progress = campaign.TargetAmount > 0 ? (campaign.CollectedAmount / campaign.TargetAmount) * 100 : 0;
+                                    }
+                                    <div class="flex justify-between mb-2">
+                                        <span class="font-label-md text-label-md text-on-surface-variant">Current Progress</span>
+                                        <span class="font-label-md text-label-md font-bold text-primary">@progress.ToString("0.##")%</span>
+                                    </div>
+                                    <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+                                        <div class="h-full bg-primary" style="width: @progress.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%;"></div>
+                                    </div>
+                                    <div class="flex justify-between mt-2">
+                                        <span class="font-label-md text-label-md font-bold text-on-surface">Rp @campaign.CollectedAmount Raised</span>
+                                        <span class="font-label-md text-label-md text-on-surface-variant">of Rp @campaign.TargetAmount</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </section>
+                    <!-- Campaign Settings Card -->
+                    <section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 shadow-sm">
+                        <div class="flex items-center gap-2 mb-6 text-primary">
+                            <span class="material-symbols-outlined">settings_suggest</span>
+                            <h2 class="font-headline-md text-headline-md">Status</h2>
+                        </div>
+                        <div class="space-y-4">
+                            @if (campaign != null)
+                            {
+                                <div class="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-3 h-3 rounded-full @(campaign.IsActive ? "bg-emerald-500 animate-pulse" : "bg-gray-400")"></span>
+                                        <span class="font-body-md text-body-md font-semibold text-primary">@(campaign.IsActive ? "Active" : "Inactive")</span>
+                                    </div>
+                                    <span class="material-symbols-outlined text-primary">@(campaign.IsActive ? "verified" : "cancel")</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input @bind="campaign.IsActive" class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary" type="checkbox" />
+                                        <span class="font-body-md text-body-md text-on-surface-variant group-hover:text-on-surface transition-colors">Visible to Public (Active)</span>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <!-- Footer Actions Mobile (Stacked) -->
+            <div class="mt-8 flex md:hidden flex-col gap-3">
+                <button @onclick="UpdateCampaign" disabled="@isSubmitting" class="w-full py-4 bg-primary text-on-primary rounded-xl font-headline-md text-headline-md shadow-lg disabled:opacity-50">
+                    @(isSubmitting ? "Updating..." : "Update Campaign")
+                </button>
+                <button class="w-full py-4 border border-outline text-on-surface-variant rounded-xl font-body-lg text-body-lg">
+                    Cancel Changes
+                </button>
+            </div>
+        </div>
+    </main>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Campaign? campaign;
+    private string? token;
+    private bool isSubmitting = false;
+    private string errorMessage = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+                if (string.IsNullOrEmpty(token))
+                {
+                    NavigationManager.NavigateTo("/login");
+                    return;
+                }
+
+                var client = HttpClientFactory.CreateClient("BackendAPI");
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                campaign = await client.GetFromJsonAsync<Campaign>($"/api/campaign/{Id}");
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                errorMessage = "Error loading campaign: " + ex.Message;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task UpdateCampaign()
+    {
+        if (campaign == null || isSubmitting) return;
+
+        isSubmitting = true;
+        errorMessage = "";
+        StateHasChanged();
+
+        try
+        {
+            var client = HttpClientFactory.CreateClient("BackendAPI");
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await client.PutAsJsonAsync($"/api/campaign/{Id}", campaign);
+            if (response.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("/penyelenggara/dashboard");
+            }
+            else
+            {
+                var err = await response.Content.ReadAsStringAsync();
+                errorMessage = string.IsNullOrEmpty(err) ? $"Error: {response.StatusCode}" : err;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error: " + ex.Message;
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    public class Campaign
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
+        public decimal TargetAmount { get; set; }
+        public decimal CollectedAmount { get; set; }
+        public string? ImageUrl { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+}
