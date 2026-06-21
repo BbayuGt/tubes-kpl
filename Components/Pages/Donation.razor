@@ -1,18 +1,15 @@
-﻿@page "/"
 @page "/donation"
+
+@using System.Globalization
+@using System.Text.RegularExpressions
 
 @inject NavigationManager Nav
 
 <div class="container mt-4">
-
     <div class="row">
-
-        <!-- Campaign Section -->
         <div class="col-md-8">
-
             <div class="card mb-4">
                 <div class="card-body">
-
                     <h2>Clean Water for Sahel</h2>
 
                     <p>
@@ -31,18 +28,14 @@
                         <strong>Rp 325.000.000</strong>
                         / Rp 500.000.000
                     </p>
-
                 </div>
             </div>
 
-            <!-- Amount Selection -->
             <div class="card">
                 <div class="card-body">
-
                     <h4>Select Amount</h4>
 
                     <div class="row g-2 mt-2">
-
                         <div class="col-4">
                             <button class="btn btn-outline-primary w-100"
                                     @onclick="() => SetAmount(10000)">
@@ -84,30 +77,59 @@
                                 Rp 500.000
                             </button>
                         </div>
-
                     </div>
 
                     <div class="mt-3">
-                        <label class="form-label">
-                            Custom Amount
-                        </label>
+                        <label class="form-label">Custom Amount</label>
 
                         <input type="number"
+                               min="@MinimumDonationAmount"
                                class="form-control"
                                @bind="CustomAmount" />
                     </div>
 
+                    @if (CustomAmount > 0 && !IsAmountValid)
+                    {
+                        <div class="text-danger small mt-2">
+                            Minimal donasi adalah Rp @MinimumDonationAmount.ToString("N0").
+                        </div>
+                    }
+
+                    <div class="mt-3">
+                        <label class="form-label">Nama Donatur</label>
+                        <input class="form-control"
+                               placeholder="Masukkan nama"
+                               @bind="DonorName" />
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label">Email Donatur</label>
+                        <input type="email"
+                               class="form-control"
+                               placeholder="Masukkan email"
+                               @bind="DonorEmail" />
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(DonorEmail) && !IsValidEmail)
+                    {
+                        <div class="text-danger small mt-2">
+                            Format email donor harus memakai domain yang valid, seperti gmail.com, yahoo.com, atau ac.id.
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">
+                            @ErrorMessage
+                        </div>
+                    }
                 </div>
             </div>
-
         </div>
 
-        <!-- Summary Section -->
         <div class="col-md-4">
-
             <div class="card">
                 <div class="card-body">
-
                     <h4>Donation Summary</h4>
 
                     <hr />
@@ -134,29 +156,62 @@
                     </h3>
 
                     <button class="btn btn-primary w-100 mt-3"
-                            @onclick="Donate">
+                            @onclick="Donate"
+                            disabled="@(!CanContinue)">
                         Continue to QRIS Payment
                     </button>
 
+                    @if (!CanContinue)
+                    {
+                        <small class="text-muted d-block mt-2">
+                            Nama wajib diisi, email harus valid, dan nominal minimal Rp @MinimumDonationAmount.ToString("N0").
+                        </small>
+                    }
                 </div>
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 @code {
-
+    private const decimal MinimumDonationAmount = 10000;
+    private static readonly HashSet<string> AllowedEmailDomains = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "gmail.com",
+        "yahoo.com",
+        "yahoo.co.id",
+        "outlook.com",
+        "hotmail.com",
+        "live.com",
+        "icloud.com",
+        "proton.me",
+        "protonmail.com"
+    };
     private decimal SelectedAmount = 100000;
-
     private decimal CustomAmount = 0;
+    private string DonorName = string.Empty;
+    private string DonorEmail = string.Empty;
+    private string ErrorMessage = string.Empty;
+    private static readonly Regex ValidEmailRegex = new(
+        @"^[^@\s]+@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,24}$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     private decimal FinalAmount =>
         CustomAmount > 0
             ? CustomAmount
             : SelectedAmount;
+
+    private bool IsValidEmail =>
+        !string.IsNullOrWhiteSpace(DonorEmail) &&
+        ValidEmailRegex.IsMatch(DonorEmail.Trim()) &&
+        HasAllowedEmailDomain(DonorEmail.Trim());
+
+    private bool IsAmountValid => FinalAmount >= MinimumDonationAmount;
+
+    private bool CanContinue =>
+        IsAmountValid &&
+        !string.IsNullOrWhiteSpace(DonorName) &&
+        IsValidEmail;
 
     private void SetAmount(decimal amount)
     {
@@ -164,9 +219,33 @@
         CustomAmount = 0;
     }
 
-    private void Donate()
+    private static bool HasAllowedEmailDomain(string email)
     {
-        Nav.NavigateTo("/payment");
+        var atIndex = email.LastIndexOf('@');
+        if (atIndex < 0 || atIndex == email.Length - 1)
+        {
+            return false;
+        }
+
+        var domain = email[(atIndex + 1)..];
+        return AllowedEmailDomains.Contains(domain) ||
+               domain.EndsWith(".ac.id", StringComparison.OrdinalIgnoreCase) ||
+               domain.EndsWith(".sch.id", StringComparison.OrdinalIgnoreCase);
     }
 
+    private void Donate()
+    {
+        if (!CanContinue)
+        {
+            ErrorMessage = !IsAmountValid
+                ? $"Minimal donasi adalah Rp {MinimumDonationAmount.ToString("N0")}."
+                : string.IsNullOrWhiteSpace(DonorName) || string.IsNullOrWhiteSpace(DonorEmail)
+                ? "Nama dan email wajib diisi."
+                : "Format email donor harus memakai domain yang valid, seperti gmail.com, yahoo.com, atau ac.id.";
+            return;
+        }
+
+        ErrorMessage = string.Empty;
+        Nav.NavigateTo($"/payment?amount={Uri.EscapeDataString(FinalAmount.ToString(CultureInfo.InvariantCulture))}");
+    }
 }

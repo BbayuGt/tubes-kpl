@@ -1,5 +1,8 @@
 ﻿@page "/success"
 
+@using Microsoft.AspNetCore.WebUtilities
+@using System.Globalization
+
 @inject NavigationManager Nav
 
 <div class="row justify-content-center">
@@ -33,7 +36,15 @@
                 </p>
 
                 <p>
-                    Rp 100.000
+                    Rp @PaymentAmount.ToString("N0")
+                </p>
+
+                <p>
+                    <strong>Status</strong>
+                </p>
+
+                <p class="text-success">
+                    @TransactionStatusLabel
                 </p>
 
                 <button class="btn btn-primary mt-3"
@@ -52,6 +63,33 @@
 </div>
 
 @code {
+    private const string PaidStatus = "PAID";
+    private decimal PaymentAmount = 100000;
+    private string TransactionStatus = PaidStatus;
+
+    protected override void OnInitialized()
+    {
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (decimal.TryParse(
+            query["amount"],
+            NumberStyles.Number,
+            CultureInfo.InvariantCulture,
+            out var amount) && amount > 0)
+        {
+            PaymentAmount = amount;
+        }
+
+        var status = query["status"].ToString();
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            TransactionStatus = status.ToUpperInvariant();
+        }
+    }
+
+    private string TransactionStatusLabel =>
+        TransactionStatus == PaidStatus ? "Berhasil" : TransactionStatus;
 
     private void BackToDonation()
     {
