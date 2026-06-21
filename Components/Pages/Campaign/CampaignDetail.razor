@@ -222,7 +222,7 @@
                     <!-- Preset Options (Design Hint from Style Guidance) -->
                     <!-- Action Buttons -->
                     <div class="space-y-3">
-                        <button class="w-full bg-primary text-on-primary py-4 rounded-lg font-bold font-label-md text-label-md hover:opacity-90 active:scale-[0.98] transition-all shadow-md">
+                        <button class="w-full bg-primary text-on-primary py-4 rounded-lg font-bold font-label-md text-label-md hover:opacity-90 active:scale-[0.98] transition-all shadow-md" @onclick='() => NavigationManager.NavigateTo($"/donation/{campaignId}")'>
                             Donate Now
                         </button>
 

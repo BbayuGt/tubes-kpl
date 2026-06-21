@@ -1,6 +1,7 @@
-﻿@page "/success"
+@page "/success"
 
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <div class="row justify-content-center">
 
@@ -25,7 +26,7 @@
                 </p>
 
                 <p>
-                    Clean Water for Sahel
+                    @(CampaignTitle ?? "Loading...")
                 </p>
 
                 <p>
@@ -33,7 +34,7 @@
                 </p>
 
                 <p>
-                    Rp 100.000
+                    Rp @DonationAmount.ToString("N0")
                 </p>
 
                 <button class="btn btn-primary mt-3"
@@ -53,9 +54,28 @@
 
 @code {
 
+    private decimal DonationAmount = 0;
+    private string? CampaignTitle;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var amountStr = await JS.InvokeAsync<string>("localStorage.getItem", "donationAmount");
+            if (decimal.TryParse(amountStr, out var amount))
+            {
+                DonationAmount = amount;
+            }
+
+            CampaignTitle = await JS.InvokeAsync<string>("localStorage.getItem", "donationCampaign");
+
+            StateHasChanged();
+        }
+    }
+
     private void BackToDonation()
     {
-        Nav.NavigateTo("/donation");
+        Nav.NavigateTo("/");
     }
 
 }

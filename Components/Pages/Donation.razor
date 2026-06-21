@@ -1,6 +1,10 @@
-﻿@page "/donation"
+@page "/donation/{campaignId:int}"
 
+@using tubes_kpl.Models
+@using tubes_kpl.Services
 @inject NavigationManager Nav
+@inject CampaignService CampaignService
+@inject IJSRuntime JS
 
 <div class="container mt-4">
 
@@ -12,23 +16,22 @@
             <div class="card mb-4">
                 <div class="card-body">
 
-                    <h2>Clean Water for Sahel</h2>
+                    <h2>@(Campaign?.Title ?? "Loading...")</h2>
 
                     <p>
-                        Providing sustainable solar-powered wells to
-                        drought-affected communities.
+                        @(Campaign?.Description ?? "Loading...")
                     </p>
 
                     <div class="progress mb-2">
                         <div class="progress-bar"
                              role="progressbar"
-                             style="width:65%">
+                             style="width:@(Campaign != null && Campaign.TargetAmount > 0 ? (Campaign.CollectedAmount / Campaign.TargetAmount * 100) : 0)%">
                         </div>
                     </div>
 
                     <p>
-                        <strong>Rp 325.000.000</strong>
-                        / Rp 500.000.000
+                        <strong>Rp @(Campaign?.CollectedAmount.ToString("N0") ?? "0")</strong>
+                        / Rp @(Campaign?.TargetAmount.ToString("N0") ?? "0")
                     </p>
 
                 </div>
@@ -113,7 +116,7 @@
 
                     <p>
                         <strong>Campaign:</strong><br />
-                        Clean Water for Sahel
+                        @(Campaign?.Title ?? "Loading...")
                     </p>
 
                     <p>
@@ -148,6 +151,11 @@
 
 @code {
 
+    [Parameter]
+    public int campaignId { get; set; }
+
+    public tubes_kpl.Models.Campaign? Campaign { get; set; }
+
     private decimal SelectedAmount = 100000;
 
     private decimal CustomAmount = 0;
@@ -157,14 +165,31 @@
             ? CustomAmount
             : SelectedAmount;
 
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Campaign = await CampaignService.GetCampaignById(campaignId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching data: {ex.Message}");
+        }
+    }
+
     private void SetAmount(decimal amount)
     {
         SelectedAmount = amount;
         CustomAmount = 0;
     }
 
-    private void Donate()
+    private async Task Donate()
     {
+        if (Campaign != null)
+        {
+            await JS.InvokeVoidAsync("localStorage.setItem", "donationAmount", FinalAmount.ToString());
+            await JS.InvokeVoidAsync("localStorage.setItem", "donationCampaign", Campaign.Title);
+        }
         Nav.NavigateTo("/payment");
     }
 

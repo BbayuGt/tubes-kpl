@@ -16,6 +16,10 @@ builder.Services.AddHttpClient("BackendAPI", client =>
 
 // Register Services
 builder.Services.AddScoped<CampaignService>();
+builder.Services.AddHttpClient<AdminApiService>(client =>
+{
+    client.BaseAddress = new Uri(backendUrl);
+});
 
 var app = builder.Build();
 

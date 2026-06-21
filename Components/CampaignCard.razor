@@ -1,4 +1,5 @@
 @using tubes_kpl.Models
+@inject NavigationManager Nav
 <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-level-1 border border-secondary-fixed flex flex-col hover:shadow-level-2 transition-shadow">
 <div class="relative h-48">
 <img alt="@Campaign.Title" class="w-full h-full object-cover" src="@(string.IsNullOrEmpty(Campaign.ImageUrl) ? "https://lh3.googleusercontent.com/aida-public/AB6AXuClC83y2ZvIWQseaFrpgEgm7EpYyj5nIIGA2_x_1l7fe7H7Snnx-aNkJH4v-Gqvu0ZgYF6hXAlL7RzkWSTU5ySl-ppV7F4Z2FG9rp8Bt0d9jBW0ySAOegYf_hxM9KSqPAtPqM06cZNG-OqOrwW1XzQTNfOfasl50LGrJ3h2s3_k-OgRrD2ycGxE2enbUbKub-PCJJdonhXr75TlLWo3WeuxCQRh2vn4hdFTz--FgTxXTTNT-c3ArGxx9vhD0V-_S6X5ePK9FBdHAZE" : Campaign.ImageUrl)"/>
@@ -15,7 +16,7 @@
 <div class="h-full bg-tertiary-container rounded-full" style="width: @(Campaign.TargetAmount > 0 ? (int)(Campaign.CollectedAmount / Campaign.TargetAmount * 100) : 0)%;"></div>
 </div>
 <div class="flex justify-between items-center">
-<button class="bg-tertiary-container hover:bg-tertiary text-on-tertiary px-4 py-2 rounded-full font-label-md text-label-md transition-colors shadow-sm">Donate Now</button>
+<button class="bg-tertiary-container hover:bg-tertiary text-on-tertiary px-4 py-2 rounded-full font-label-md text-label-md transition-colors shadow-sm" @onclick='() => Nav.NavigateTo($"/donation/{Campaign.Id}")'>Donate Now</button>
 </div>
 </div>
 </div>
