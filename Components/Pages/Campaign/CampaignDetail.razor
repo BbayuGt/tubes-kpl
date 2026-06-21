@@ -1,5 +1,7 @@
 @page "/CampaignDetail/{Id:int}"
 @using tubes_kpl.Models
+@using System.Net.Http.Json
+@inject HttpClient Http
 @inject NavigationManager NavigationManager
 
 
@@ -268,3 +270,26 @@
 
 </body>
 </html>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public int DonationAmount { get; set; }
+
+    // Menggunakan nama lengkap agar tidak konflik dengan folder Campaign
+    public tubes_kpl.Models.Campaign? Campaign { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Panggil backend Anda
+            Campaign = await Http.GetFromJsonAsync<tubes_kpl.Models.Campaign>($"http://localhost:8080/api/Campaign/{Id}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching data: {ex.Message}");
+        }
+    }
+}
