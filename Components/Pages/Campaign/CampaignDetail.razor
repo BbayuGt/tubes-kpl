@@ -1,0 +1,301 @@
+@page "/campaign-detail"
+
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HumanityFlow - Campaign Details</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#e1e3e4",
+                    "on-primary-container": "#bbd0ff",
+                    "primary-fixed": "#d7e2ff",
+                    "surface-dim": "#d2dbe4",
+                    "tertiary-fixed-dim": "#66df75",
+                    "inverse-on-surface": "#e9f2fb",
+                    "surface-container-highest": "#dbe4ed",
+                    "on-tertiary-fixed": "#002106",
+                    "surface-container": "#e6eff8",
+                    "secondary": "#5c5f60",
+                    "tertiary": "#004c17",
+                    "on-primary-fixed-variant": "#004491",
+                    "surface-container-low": "#ecf5fe",
+                    "surface-bright": "#f6faff",
+                    "on-secondary-fixed-variant": "#454748",
+                    "tertiary-container": "#006722",
+                    "surface": "#f6faff",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-container": "#626566",
+                    "primary-fixed-dim": "#acc7ff",
+                    "on-surface-variant": "#424752",
+                    "on-tertiary-container": "#6fe87c",
+                    "surface-variant": "#dbe4ed",
+                    "outline-variant": "#c2c6d4",
+                    "on-surface": "#141d23",
+                    "on-primary-fixed": "#001a40",
+                    "inverse-surface": "#293138",
+                    "on-background": "#141d23",
+                    "primary-container": "#0056b3",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed-dim": "#c5c7c8",
+                    "surface-container-high": "#e0e9f2",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#83fc8e",
+                    "error": "#ba1a1a",
+                    "surface-tint": "#115cb9",
+                    "outline": "#727784",
+                    "inverse-primary": "#acc7ff",
+                    "background": "#f6faff",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#00531a",
+                    "on-secondary-fixed": "#191c1d",
+                    "on-error": "#ffffff",
+                    "secondary-fixed": "#e1e3e4",
+                    "on-tertiary": "#ffffff",
+                    "primary": "#003f87"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-md": "16px",
+                    "base": "8px",
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "stack-sm": "8px",
+                    "stack-lg": "32px",
+                    "margin-desktop": "40px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f6faff;
+            font-family: 'Inter', sans-serif;
+            color: #141d23;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .progress-bar-fill {
+            transition: width 1s ease-out;
+        }
+        .sticky-card {
+            position: sticky;
+            top: 24px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- Top Navigation Bar -->
+<header class="bg-surface border-b border-outline-variant shadow-sm w-full h-16 sticky top-0 z-50">
+<div class="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto h-full">
+<div class="font-headline-md text-headline-md font-bold text-primary cursor-pointer active:scale-95 transition-transform">
+                HumanityFlow
+            </div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1 transition-colors" href="#">Explore</a>
+<a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors" href="#">Impact</a>
+<a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors" href="#">Transparency</a>
+<a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors" href="#">About</a>
+</nav>
+<div class="flex items-center gap-gutter">
+<div class="hidden md:block">
+<button class="font-label-md text-label-md bg-primary text-on-primary px-6 py-2 rounded-lg font-bold cursor-pointer active:scale-95 transition-transform">
+                        Sign In
+                    </button>
+</div>
+<span class="material-symbols-outlined text-secondary md:hidden cursor-pointer" data-icon="menu">menu</span>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-desktop py-stack-lg">
+<!-- Breadcrumb / Back Link -->
+<div class="mb-stack-lg">
+<a class="flex items-center gap-2 text-primary font-label-md text-label-md group" href="#">
+<span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform" data-icon="arrow_back">arrow_back</span>
+                Back to Campaigns
+            </a>
+</div>
+<!-- Two Column Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Left Column: Content -->
+<div class="md:col-span-8">
+<!-- Hero Image -->
+<div class="rounded-xl overflow-hidden shadow-sm mb-stack-lg bg-surface-container-high aspect-[16/9]">
+<img alt="Campaign Image" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLvX9KLzfVoN7_qt_xyvKfU9RKiBOOx6fYR1eInmM5AokDPuYBj_P2jhM2Y5xhRqSV5c5UDO3eBSRx78ogD82O62JTdej9xAtc6uu4joEZq-g5jm-gHi3IJkzo9hmA3WzoHq_uCFFX571tvKkyYyPBHUb_w-KTNW441BHOCw3qLtj3Wv5OfWY3MXxixz_GDzkydgTxx_bK1msnuJRAqVLs1_pxrGU3Jj0h2c1QOQZdkrXCEtR4sdf61NJVA"/>
+</div>
+<!-- Campaign Title & Status -->
+<div class="mb-stack-lg">
+<div class="flex items-center gap-base mb-base">
+<span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse"></span>
+                            Active
+                        </span>
+<span class="text-on-surface-variant font-label-sm text-label-sm">Created on Oct 12, 2023</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-stack-sm tracking-tight">Clean Water for Remote Villages</h1>
+<div class="flex items-center gap-base text-secondary font-label-md text-label-md">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+                        East Nusa Tenggara, Indonesia
+                    </div>
+</div>
+<!-- Description Section -->
+<section class="prose max-w-none">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-4">Project Overview</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-6 leading-relaxed">
+                        Access to clean water remains one of the most significant challenges in remote mountainous regions. This project aims to install sustainable gravity-fed water systems and solar-powered filtration units in three key village clusters that currently rely on unsafe river sources.
+                    </p>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
+                        By providing reliable access to clean water, we aren't just improving health outcomes—we are empowering families. Children can spend more time in school rather than walking hours to fetch water, and local healthcare clinics can operate with the hygiene standards necessary to save lives.
+                    </p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md my-stack-lg">
+<div class="p-stack-md rounded-lg border border-outline-variant bg-surface-container-lowest">
+<span class="material-symbols-outlined text-primary mb-2" data-icon="opacity">opacity</span>
+<h3 class="font-label-md text-label-md text-on-surface mb-1">Sustainable Supply</h3>
+<p class="text-label-sm text-on-surface-variant">Maintenance-free gravity systems designed for 20+ years of use.</p>
+</div>
+<div class="p-stack-md rounded-lg border border-outline-variant bg-surface-container-lowest">
+<span class="material-symbols-outlined text-primary mb-2" data-icon="health_and_safety">health_and_safety</span>
+<h3 class="font-label-md text-label-md text-on-surface mb-1">Health Impact</h3>
+<p class="text-label-sm text-on-surface-variant">Estimated 75% reduction in waterborne illnesses in the region.</p>
+</div>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-4">Implementation Plan</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">
+                        Our approach involves radical transparency. Every dollar is tracked, and donors receive monthly GPS-tagged updates and water quality reports from the field. Our team of local engineers is already on-site conducting final surveys.
+                    </p>
+</section>
+<!-- Activity Feed (Design Hint) -->
+<div class="mt-stack-lg pt-stack-lg border-t border-outline-variant">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-6">Recent Donations</h2>
+<div class="space-y-4">
+<div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-low transition-all hover:bg-surface-container">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">JD</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Jane Doe donated <span class="font-bold">Rp 1,000,000</span></p>
+<p class="text-label-sm text-on-surface-variant">2 hours ago • "Hoping for the best for the village kids!"</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-low transition-all hover:bg-surface-container">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary font-bold">A</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Anonymous donated <span class="font-bold">Rp 500,000</span></p>
+<p class="text-label-sm text-on-surface-variant">5 hours ago</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Sticky Donation Card -->
+<div class="md:col-span-4 relative">
+<div class="sticky-card bg-surface-container-lowest rounded-xl p-stack-lg shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-outline-variant">
+<!-- Progress Information -->
+<div class="mb-stack-md">
+<div class="flex justify-between items-end mb-2">
+<h3 class="font-headline-md text-headline-md text-primary">Rp 64,000,000</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant">of Rp 100,000,000</span>
+</div>
+<!-- Success Green Progress Bar -->
+<div class="w-full h-2 bg-secondary-container rounded-full overflow-hidden mb-2">
+<div class="h-full bg-[#16A34A] rounded-full progress-bar-fill" style="width: 64%;"></div>
+</div>
+<div class="flex justify-between items-center text-label-sm font-label-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="groups">groups</span> 1,240 Donors</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span> 14 Days left</span>
+</div>
+</div>
+<!-- Preset Options (Design Hint from Style Guidance) -->
+<div class="grid grid-cols-2 gap-2 mb-stack-md">
+<button class="py-3 px-4 border border-outline-variant rounded-lg font-label-md text-label-md hover:border-primary hover:text-primary hover:bg-primary-fixed-dim transition-all text-center">Rp 100k</button>
+<button class="py-3 px-4 border border-primary bg-primary-fixed-dim rounded-lg font-label-md text-label-md text-primary transition-all text-center">Rp 500k</button>
+<button class="py-3 px-4 border border-outline-variant rounded-lg font-label-md text-label-md hover:border-primary hover:text-primary hover:bg-primary-fixed-dim transition-all text-center">Rp 1M</button>
+<button class="py-3 px-4 border border-outline-variant rounded-lg font-label-md text-label-md hover:border-primary hover:text-primary hover:bg-primary-fixed-dim transition-all text-center">Custom</button>
+</div>
+<!-- Action Buttons -->
+<div class="space-y-3">
+<button class="w-full bg-primary text-on-primary py-4 rounded-lg font-bold font-label-md text-label-md hover:opacity-90 active:scale-[0.98] transition-all shadow-md">
+                            Donate Now
+                        </button>
+<button class="w-full bg-surface-container-low text-primary py-4 rounded-lg font-bold font-label-md text-label-md flex items-center justify-center gap-2 border border-outline-variant hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+                            Share Campaign
+                        </button>
+</div>
+<!-- Transparency Note -->
+<div class="mt-6 flex items-start gap-3 p-3 rounded-lg bg-surface-container-low border border-outline-variant">
+<span class="material-symbols-outlined text-primary" data-icon="verified">verified</span>
+<p class="text-label-sm text-on-surface-variant">Verified by HumanityFlow radical transparency engine. 100% impact guarantee.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low border-t border-outline-variant w-full py-stack-lg mt-stack-lg">
+<div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-stack-md">
+<div class="text-left">
+<div class="font-headline-md text-headline-md font-bold text-primary mb-2">HumanityFlow</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm">© 2024 HumanityFlow. Radical transparency in humanitarian aid.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-body-md text-body-md text-on-surface-variant hover:underline transition-all" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:underline transition-all" href="#">Terms of Service</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:underline transition-all" href="#">Contact Support</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:underline transition-all font-bold" href="#">Annual Reports</a>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interaction for donation buttons
+        const donationButtons = document.querySelectorAll('.grid-cols-2 button');
+        donationButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                donationButtons.forEach(b => {
+                    b.classList.remove('border-primary', 'bg-primary-fixed-dim', 'text-primary');
+                    b.classList.add('border-outline-variant');
+                });
+                btn.classList.add('border-primary', 'bg-primary-fixed-dim', 'text-primary');
+                btn.classList.remove('border-outline-variant');
+            });
+        });
+    </script>
+</body></html>
