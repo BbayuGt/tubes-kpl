@@ -1,0 +1,60 @@
+﻿@page "/payment"
+
+@inject NavigationManager Nav
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-6">
+
+            <div class="card shadow">
+
+                <div class="card-body text-center">
+
+                    <h2 class="mb-4">
+                        Complete Your Payment
+                    </h2>
+
+                    <p>
+                        Scan QRIS berikut menggunakan Mobile Banking atau E-Wallet.
+                    </p>
+
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HumanityFlowDonation"
+                         class="img-fluid mb-4"
+                         alt="QRIS Code" />
+
+                    <div class="alert alert-info">
+
+                        <strong>Total Payment</strong>
+
+                        <h3 class="mt-2">
+                            Rp 100.000
+                        </h3>
+
+                    </div>
+
+                    <button class="btn btn-success w-100"
+                            @onclick="GoToVerification">
+
+                        I Have Completed Payment
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+private void GoToVerification()
+    {
+        Nav.NavigateTo("/verification");
+    }
+}

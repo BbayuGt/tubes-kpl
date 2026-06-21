@@ -1,0 +1,56 @@
+﻿@page "/verification"
+
+@inject NavigationManager Nav
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-6">
+
+            <div class="card shadow">
+
+                <div class="card-body text-center">
+
+                    <div class="spinner-border text-primary mb-3"
+                         role="status">
+                    </div>
+
+                    <h3>
+                        Verifying Your Donation
+                    </h3>
+
+                    <p>
+                        Please wait while we verify your payment.
+                    </p>
+
+                    <div class="alert alert-warning mt-3">
+
+                        Payment verification in progress...
+
+                    </div>
+
+                    <button class="btn btn-primary mt-3"
+                            @onclick="GoToSuccess">
+
+                        Continue
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+private void GoToSuccess()
+    {
+        Nav.NavigateTo("/success");
+    }
+}
