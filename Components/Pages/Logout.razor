@@ -1,0 +1,15 @@
+@page "/logout"
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "authToken");
+            NavigationManager.NavigateTo("/login", true);
+        }
+    }
+}

@@ -3,21 +3,10 @@
 @inject IHttpClientFactory HttpClientFactory
 @inject NavigationManager NavigationManager
 
-<!DOCTYPE html>
-
-<html class="light" lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<HeadContent>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <title>Login - HumanityFlow</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet"/>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -129,8 +118,11 @@
             background-size: 24px 24px;
         }
     </style>
-</head>
-<body class="bg-background min-h-screen flex flex-col font-sans text-on-surface antialiased bg-subtle-pattern">
+</HeadContent>
+
+<PageTitle>Login - HumanityFlow</PageTitle>
+
+<div class="bg-background min-h-screen flex flex-col font-sans text-on-surface antialiased bg-subtle-pattern">
 <!-- TopNavBar (Suppressed due to Linear/Transactional intent, but keeping brand identity minimal) -->
 <header class="w-full py-6 px-base md:px-margin-desktop text-center md:text-left absolute top-0 left-0">
     <a class="inline-block" href="#">
@@ -149,7 +141,7 @@
                     journey.</p>
             </div>
             <!-- Form -->
-            <form @onsubmit="HandleLogin" class="flex flex-col gap-5">
+            <EditForm Model="this" OnValidSubmit="HandleLogin" FormName="loginForm" class="flex flex-col gap-5">
                 @if (!string.IsNullOrEmpty(errorMessage))
                 {
                     <div class="bg-error-container text-on-error-container p-3 rounded text-sm mb-2">
@@ -192,7 +184,7 @@
                     type="submit">
                     Sign In
                 </button>
-            </form>
+            </EditForm>
             <div class="mt-8 text-center">
                 <p class="text-body-md font-body-md text-on-surface-variant">
                     Don't have an account?
@@ -221,10 +213,23 @@
     <p class="text-label-sm font-label-sm opacity-60">© 2026 HumanityFlow.</p>
 </footer>
 
+@inject IJSRuntime JSRuntime
 @code {
     private string email = "";
     private string password = "";
     private string? errorMessage;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                NavigationManager.NavigateTo("/", true);
+            }
+        }
+    }
 
     private async Task HandleLogin()
     {
@@ -238,8 +243,15 @@
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
-                // You can store the token from result.GetProperty("token").GetString()
-                NavigationManager.NavigateTo("/");
+                if (result.TryGetProperty("token", out var tokenProp))
+                {
+                    var token = tokenProp.GetString();
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", token);
+                    }
+                }
+                NavigationManager.NavigateTo("/", true);
             }
             else
             {
@@ -253,5 +265,4 @@
         }
     }
 }
-</body>
-</html>
+</div>
