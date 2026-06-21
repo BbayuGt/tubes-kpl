@@ -1,20 +1,12 @@
-﻿@page "/login"
+@page "/login"
+@rendermode InteractiveServer
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
 
-<!DOCTYPE html>
-
-<html class="light" lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<HeadContent>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <title>Login - HumanityFlow</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet"/>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -126,8 +118,11 @@
             background-size: 24px 24px;
         }
     </style>
-</head>
-<body class="bg-background min-h-screen flex flex-col font-sans text-on-surface antialiased bg-subtle-pattern">
+</HeadContent>
+
+<PageTitle>Login - HumanityFlow</PageTitle>
+
+<div class="bg-background min-h-screen flex flex-col font-sans text-on-surface antialiased bg-subtle-pattern">
 <!-- TopNavBar (Suppressed due to Linear/Transactional intent, but keeping brand identity minimal) -->
 <header class="w-full py-6 px-base md:px-margin-desktop text-center md:text-left absolute top-0 left-0">
     <a class="inline-block" href="#">
@@ -146,10 +141,16 @@
                     journey.</p>
             </div>
             <!-- Form -->
-            <form action="#" class="flex flex-col gap-5" method="POST">
+            <EditForm Model="this" OnValidSubmit="HandleLogin" FormName="loginForm" class="flex flex-col gap-5">
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="bg-error-container text-on-error-container p-3 rounded text-sm mb-2">
+                        @errorMessage
+                    </div>
+                }
                 <!-- Email Field -->
                 <div class="relative group">
-                    <input
+                    <input @bind="email"
                         class="peer w-full px-4 py-3 rounded border border-outline-variant bg-surface-container-lowest text-on-surface text-body-md placeholder-transparent focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all"
                         id="email" name="email" placeholder="Email address" required="" type="email"/>
                     <label
@@ -160,7 +161,7 @@
                 </div>
                 <!-- Password Field -->
                 <div class="relative group">
-                    <input
+                    <input @bind="password"
                         class="peer w-full px-4 py-3 rounded border border-outline-variant bg-surface-container-lowest text-on-surface text-body-md placeholder-transparent focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all"
                         id="password" name="password" placeholder="Password" required="" type="password"/>
                     <label
@@ -183,7 +184,7 @@
                     type="submit">
                     Sign In
                 </button>
-            </form>
+            </EditForm>
             <div class="mt-8 text-center">
                 <p class="text-body-md font-body-md text-on-surface-variant">
                     Don't have an account?
@@ -211,5 +212,57 @@
 <footer class="w-full py-6 px-base md:px-margin-desktop text-center text-on-surface-variant">
     <p class="text-label-sm font-label-sm opacity-60">© 2026 HumanityFlow.</p>
 </footer>
-</body>
-</html>
+
+@inject IJSRuntime JSRuntime
+@code {
+    private string email = "";
+    private string password = "";
+    private string? errorMessage;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                NavigationManager.NavigateTo("/", true);
+            }
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        errorMessage = null;
+        var client = HttpClientFactory.CreateClient("BackendAPI");
+        
+        try
+        {
+            var response = await client.PostAsJsonAsync("api/Auth/login", new { Email = email, Password = password });
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+                if (result.TryGetProperty("token", out var tokenProp))
+                {
+                    var token = tokenProp.GetString();
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", token);
+                    }
+                }
+                NavigationManager.NavigateTo("/", true);
+            }
+            else
+            {
+                var errorText = await response.Content.ReadAsStringAsync();
+                errorMessage = string.IsNullOrEmpty(errorText) ? "Login failed." : errorText;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "An error occurred while trying to log in: " + ex.Message;
+        }
+    }
+}
+</div>
