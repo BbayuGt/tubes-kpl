@@ -62,6 +62,17 @@
     <style>
         .shadow-ambient-1 { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
         .shadow-ambient-2 { box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08); }
+        .nav-link { position: relative; padding-bottom: 12px; }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #003f87;
+            border-radius: 1px 1px 0 0;
+        }
     </style>
 </head>
 <body class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
@@ -74,67 +85,34 @@
         </div>
     }
 
-    <nav class="bg-surface-container-lowest border-b border-outline-variant/30 sticky top-0 z-40">
-        <div class="max-w-[1600px] mx-auto px-gutter flex items-center justify-between h-16">
-            <div class="flex items-center gap-10">
-                <a href="/admin" class="font-headline-md text-headline-md text-primary tracking-tight">HumanityFlow</a>
+    <nav class="bg-surface-container-lowest border-b border-outline-variant/30 sticky top-0 z-50">
+        <div class="max-w-[1280px] mx-auto flex items-center justify-between px-6 py-3">
+            <div class="flex items-center gap-8">
+                <a href="/admin" class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-[28px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+                    <span class="text-headline-md font-headline-md font-bold text-primary">HumanityFlow</span>
+                </a>
                 <div class="hidden md:flex items-center gap-1">
-                    <a href="/admin" class="px-4 py-2 rounded-lg text-label-md font-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors">Overview</a>
-                    <a href="/admin/campaigns" class="px-4 py-2 rounded-lg text-label-md font-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors">Campaigns</a>
-                    <a href="/admin/donations" class="px-4 py-2 rounded-lg text-label-md font-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors">Donations</a>
-                    <a href="/admin/applicants" class="px-4 py-2 rounded-lg text-label-md font-label-md text-primary border-b-2 border-primary bg-primary-fixed/20">Applicants</a>
+                    <a href="/admin" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Overview</a>
+                    <a href="/admin/campaigns" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Campaigns</a>
+                    <a href="/admin/donations" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Donations</a>
+                    <a href="/admin/applicants" class="nav-link active text-label-md font-label-md text-primary px-3 py-3">Applicants</a>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <button class="p-2 rounded-lg hover:bg-surface-container-high transition-colors text-on-surface-variant">
-                    <span class="material-symbols-outlined text-[22px]">search</span>
+                <button class="relative p-2 rounded-lg hover:bg-surface-container transition-colors" title="Notifications">
+                    <span class="material-symbols-outlined text-on-surface-variant text-[22px]" style="font-variation-settings: 'FILL' 0;">notifications</span>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
                 </button>
-                <button class="p-2 rounded-lg hover:bg-surface-container-high transition-colors text-on-surface-variant relative">
-                    <span class="material-symbols-outlined text-[22px]">notifications</span>
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
-                </button>
-                <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-label-md text-label-sm ml-1">
-                    AR
+                <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center">
+                    <span class="text-label-sm font-label-sm text-on-primary">AD</span>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="flex flex-1 overflow-hidden">
-
-        <aside class="hidden lg:flex flex-col w-56 border-r border-outline-variant/30 bg-surface-container-lowest py-6 px-3 shrink-0">
-            <div class="flex flex-col gap-1">
-                <a href="/admin/applicants" class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-primary-fixed text-primary font-label-md text-label-md transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">verified</span>
-                    Verification Queue
-                </a>
-                <a href="/admin" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high font-label-md text-label-md transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">dashboard</span>
-                    Overview
-                </a>
-                <a href="/admin/applicants" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high font-label-md text-label-md transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">history</span>
-                    Review History
-                </a>
-                <a href="/admin/applicants" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high font-label-md text-label-md transition-colors">
-                    <span class="material-symbols-outlined text-[20px]">shield</span>
-                    Compliance Settings
-                </a>
-            </div>
-            <div class="mt-auto pt-6 border-t border-outline-variant/30">
-                <div class="bg-surface-container rounded-xl p-4 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-label-md text-label-sm shrink-0">
-                        AR
-                    </div>
-                    <div class="min-w-0">
-                        <p class="font-label-md text-label-md text-on-surface truncate">Admin Reviewer</p>
-                        <p class="text-label-sm font-label-sm text-on-surface-variant truncate">Senior Analyst</p>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <main class="flex-1 overflow-y-auto p-gutter">
+    <main class="flex-grow">
+        <div class="max-w-[1280px] mx-auto px-6 py-8">
 
             @if (isLoading)
             {
@@ -145,9 +123,10 @@
                     </div>
                 </div>
             }
-            else if (selectedApplication == null)
+            else
             {
-                <div class="max-w-4xl mx-auto">
+                @if (selectedApplication == null)
+                {
                     <div class="mb-6">
                         <h1 class="font-headline-lg text-headline-lg text-on-surface">Verification Queue</h1>
                         <p class="text-body-md font-body-md text-on-surface-variant mt-1">@applications.Count application(s) pending review</p>
@@ -173,9 +152,9 @@
                                             </div>
                                             <div>
                                                 <div class="flex items-center gap-2">
-                                                    <p class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">APP-@app.Id</p>
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#fef3c7] text-[#92400e]">Pending</span>
-                                                </div>
+                                                     <p class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">APP-@app.Id</p>
+                                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#fef3c7] text-[#92400e]">@app.Status</span>
+                                                 </div>
                                                 <p class="text-body-md font-body-md text-on-surface mt-0.5">@(app.User?.Name ?? "Unknown")</p>
                                                 <p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5">@(app.Campaign?.Title ?? "Unknown Campaign")</p>
                                             </div>
@@ -189,231 +168,227 @@
                             }
                         </div>
                     }
-                </div>
+                }
+                else
+                {
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <!-- Left Column: Details -->
+                        <div class="lg:col-span-8 flex flex-col gap-6">
+                            <div class="flex items-center gap-3">
+                                <button @onclick="BackToQueue" class="p-2 rounded-lg hover:bg-surface-container-high transition-colors text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                                </button>
+                                <nav class="flex items-center gap-2 text-label-md font-label-md">
+                                    <button @onclick="BackToQueue" class="text-on-surface-variant hover:text-primary transition-colors">Verification Queue</button>
+                                    <span class="material-symbols-outlined text-[16px] text-outline-variant">chevron_right</span>
+                                    <span class="text-on-surface">APP-@selectedApplication.Id</span>
+                                </nav>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <h1 class="font-headline-lg text-headline-lg text-on-surface">Application Verification</h1>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-label-sm font-label-sm bg-[#fef3c7] text-[#92400e]">
+                                    <span class="material-symbols-outlined text-[14px] mr-1">priority_high</span>
+                                    Urgent Priority
+                                </span>
+                            </div>
+
+                            <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 p-6">
+                                <h2 class="font-headline-md text-headline-md text-on-surface mb-4">Applicant Information</h2>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-8">
+                                    <div>
+                                        <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Organization / Name</p>
+                                        <p class="text-body-md font-body-md text-on-surface">@(selectedApplication.User?.Name ?? "Unknown")</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Type</p>
+                                        <p class="text-body-md font-body-md text-on-surface">Individual Donor</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Country</p>
+                                        <p class="text-body-md font-body-md text-on-surface">Indonesia</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Requested Amount</p>
+                                        <p class="text-body-md font-body-md text-on-surface font-semibold">Rp @FormatCurrency(selectedApplication.Amount)</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Duration</p>
+                                        <p class="text-body-md font-body-md text-on-surface">One-time</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Contact</p>
+                                        <p class="text-body-md font-body-md text-on-surface">@(selectedApplication.User?.Email ?? "N/A")</p>
+                                    </div>
+                                </div>
+                                <div class="mt-6 bg-surface-variant rounded-lg h-40 flex items-center justify-center">
+                                    <div class="flex flex-col items-center gap-2 text-on-surface-variant">
+                                        <span class="material-symbols-outlined text-[36px]">location_on</span>
+                                        <p class="text-label-sm font-label-sm">Location - Indonesia</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 p-6">
+                                <h2 class="font-headline-md text-headline-md text-on-surface mb-2">Project Description</h2>
+                                <h3 class="text-body-lg font-body-lg text-primary font-semibold mb-2">@(selectedApplication.Campaign?.Title ?? "Unknown Campaign")</h3>
+                                <p class="text-body-md font-body-md text-on-surface-variant leading-relaxed mb-6">@(selectedApplication.Campaign?.Description ?? "No description available.")</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div class="bg-surface-container rounded-xl p-4 text-center">
+                                        <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Target Reach</p>
+                                        <p class="font-headline-md text-headline-md text-on-surface">Rp @FormatCurrency(selectedApplication.Campaign?.TargetAmount ?? 0)</p>
+                                    </div>
+                                    <div class="bg-surface-container rounded-xl p-4 text-center">
+                                        <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Cost / Capita</p>
+                                        <p class="font-headline-md text-headline-md text-on-surface">Rp @FormatCurrency(selectedApplication.Amount)</p>
+                                    </div>
+                                    <div class="bg-surface-container rounded-xl p-4 text-center">
+                                        <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Status</p>
+                                        @if (selectedApplication.Campaign?.IsActive == true)
+                                        {
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed">
+                                                <span class="material-symbols-outlined text-[14px] mr-1">check_circle</span>
+                                                Active
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-label-sm font-label-sm bg-surface-variant text-on-surface-variant">
+                                                <span class="material-symbols-outlined text-[14px] mr-1">cancel</span>
+                                                Inactive
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 p-6">
+                                <h2 class="font-headline-md text-headline-md text-on-surface mb-4">Supporting Documents</h2>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="flex items-center gap-4 bg-surface-container rounded-xl p-4">
+                                        <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
+                                            <span class="material-symbols-outlined text-[20px] text-primary">description</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-label-md text-label-md text-on-surface truncate">Organization_Registration.pdf</p>
+                                            <p class="text-label-sm font-label-sm text-on-surface-variant">2.4 MB</p>
+                                        </div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed shrink-0">Verified</span>
+                                    </div>
+                                    <div class="flex items-center gap-4 bg-surface-container rounded-xl p-4">
+                                        <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
+                                            <span class="material-symbols-outlined text-[20px] text-primary">description</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-label-md text-label-md text-on-surface truncate">Financial_Statement_2025.xlsx</p>
+                                            <p class="text-label-sm font-label-sm text-on-surface-variant">1.8 MB</p>
+                                        </div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed shrink-0">Verified</span>
+                                    </div>
+                                    <div class="flex items-center gap-4 bg-surface-container rounded-xl p-4">
+                                        <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
+                                            <span class="material-symbols-outlined text-[20px] text-primary">description</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-label-md text-label-md text-on-surface truncate">Project_Proposal.pdf</p>
+                                            <p class="text-label-sm font-label-sm text-on-surface-variant">3.1 MB</p>
+                                        </div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#fef3c7] text-[#92400e] shrink-0">Under Review</span>
+                                    </div>
+                                    <div class="flex items-center gap-4 bg-surface-container rounded-xl p-4">
+                                        <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
+                                            <span class="material-symbols-outlined text-[20px] text-primary">description</span>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-label-md text-label-md text-on-surface truncate">Impact_Assessment.pdf</p>
+                                            <p class="text-label-sm font-label-sm text-on-surface-variant">1.2 MB</p>
+                                        </div>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-variant text-on-surface-variant shrink-0">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Final Decision & KYC/AML -->
+                        <div class="lg:col-span-4 flex flex-col gap-6">
+                            <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 p-6">
+                                <h3 class="font-headline-md text-headline-md text-on-surface mb-4">Final Decision</h3>
+                                <button @onclick="ApproveApplication" class="w-full bg-tertiary-container text-on-tertiary hover:opacity-90 rounded-lg py-3 flex items-center justify-center gap-2 font-label-md text-label-md transition-opacity mb-3">
+                                    <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                                    Approve Application
+                                </button>
+                                <button @onclick="RejectApplication" class="w-full border-2 border-error text-error hover:bg-error-container rounded-lg py-3 flex items-center justify-center gap-2 font-label-md text-label-md transition-colors mb-4">
+                                    <span class="material-symbols-outlined text-[20px]">cancel</span>
+                                    Reject Application
+                                </button>
+                                <div class="flex items-center gap-4 mb-4">
+                                    <hr class="flex-1 border-outline-variant/30"/>
+                                    <span class="text-label-sm font-label-sm text-on-surface-variant">OR</span>
+                                    <hr class="flex-1 border-outline-variant/30"/>
+                                </div>
+                                <p class="text-label-md font-label-md text-on-surface mb-2">Request Data Revision</p>
+                                <textarea @bind="revisionNotes" rows="4" placeholder="Enter revision notes..." class="w-full rounded-lg border border-outline-variant/50 bg-surface-container p-3 text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none mb-3"></textarea>
+                                <button @onclick="SendRevisionRequest" class="w-full bg-primary text-on-primary rounded-lg py-2.5 font-label-md text-label-md hover:opacity-90 transition-opacity">
+                                    Send Revision Request
+                                </button>
+                            </div>
+
+                            <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-label-md text-label-md text-on-surface">KYC/AML Compliance</h3>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed">Passed</span>
+                                </div>
+                                <div class="flex flex-col gap-3">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-[20px] text-tertiary">check_circle</span>
+                                        <span class="text-body-md font-body-md text-on-surface">Identity Verified</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-[20px] text-tertiary">check_circle</span>
+                                        <span class="text-body-md font-body-md text-on-surface">Sanctions Screening Clear</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-[20px] text-tertiary">check_circle</span>
+                                        <span class="text-body-md font-body-md text-on-surface">PEP Check Negative</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-label-md text-label-md text-on-surface">AI Fraud Detection</h3>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed">Low Risk</span>
+                                </div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-label-sm font-label-sm text-on-surface-variant">Risk Score</span>
+                                    <span class="font-headline-md text-headline-md text-tertiary">12%</span>
+                                </div>
+                                <div class="w-full bg-surface-variant rounded-full h-2 mb-5">
+                                    <div class="bg-tertiary rounded-full h-2" style="width: 12%"></div>
+                                </div>
+                                <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-3">Key Indicators</p>
+                                <div class="flex flex-col gap-3">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
+                                        <span class="text-label-md font-label-md text-on-surface">Transaction Pattern Normal</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
+                                        <span class="text-label-md font-label-md text-on-surface">Device Fingerprint Valid</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
+                                        <span class="text-label-md font-label-md text-on-surface">Behavioral Analysis Clean</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
             }
-            else
-            {
-                <div class="max-w-4xl mx-auto">
 
-                    <div class="flex items-center gap-3 mb-6">
-                        <button @onclick="BackToQueue" class="p-2 rounded-lg hover:bg-surface-container-high transition-colors text-on-surface-variant">
-                            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
-                        </button>
-                        <nav class="flex items-center gap-2 text-label-md font-label-md">
-                            <button @onclick="BackToQueue" class="text-on-surface-variant hover:text-primary transition-colors">Verification Queue</button>
-                            <span class="material-symbols-outlined text-[16px] text-outline-variant">chevron_right</span>
-                            <span class="text-on-surface">APP-@selectedApplication.Id</span>
-                        </nav>
-                    </div>
-
-                    <div class="flex items-center gap-3 mb-6">
-                        <h1 class="font-headline-lg text-headline-lg text-on-surface">Application Verification</h1>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-label-sm font-label-sm bg-[#fef3c7] text-[#92400e]">
-                            <span class="material-symbols-outlined text-[14px] mr-1">priority_high</span>
-                            Urgent Priority
-                        </span>
-                    </div>
-
-                    <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 p-6 mb-6">
-                        <h2 class="font-headline-md text-headline-md text-on-surface mb-4">Applicant Information</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-5 gap-x-8">
-                            <div>
-                                <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Organization / Name</p>
-                                <p class="text-body-md font-body-md text-on-surface">@(selectedApplication.User?.Name ?? "Unknown")</p>
-                            </div>
-                            <div>
-                                <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Type</p>
-                                <p class="text-body-md font-body-md text-on-surface">Individual Donor</p>
-                            </div>
-                            <div>
-                                <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Country</p>
-                                <p class="text-body-md font-body-md text-on-surface">Indonesia</p>
-                            </div>
-                            <div>
-                                <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Requested Amount</p>
-                                <p class="text-body-md font-body-md text-on-surface font-semibold">Rp @FormatCurrency(selectedApplication.Amount)</p>
-                            </div>
-                            <div>
-                                <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Duration</p>
-                                <p class="text-body-md font-body-md text-on-surface">One-time</p>
-                            </div>
-                            <div>
-                                <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Contact</p>
-                                <p class="text-body-md font-body-md text-on-surface">@(selectedApplication.User?.Email ?? "N/A")</p>
-                            </div>
-                        </div>
-                        <div class="mt-6 bg-surface-variant rounded-lg h-40 flex items-center justify-center">
-                            <div class="flex flex-col items-center gap-2 text-on-surface-variant">
-                                <span class="material-symbols-outlined text-[36px]">location_on</span>
-                                <p class="text-label-sm font-label-sm">Location - Indonesia</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 p-6 mb-6">
-                        <h2 class="font-headline-md text-headline-md text-on-surface mb-2">Project Description</h2>
-                        <h3 class="text-body-lg font-body-lg text-primary font-semibold mb-2">@(selectedApplication.Campaign?.Title ?? "Unknown Campaign")</h3>
-                        <p class="text-body-md font-body-md text-on-surface-variant leading-relaxed mb-6">@(selectedApplication.Campaign?.Description ?? "No description available.")</p>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div class="bg-surface-container rounded-xl p-4 text-center">
-                                <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Target Reach</p>
-                                <p class="font-headline-md text-headline-md text-on-surface">Rp @FormatCurrency(selectedApplication.Campaign?.TargetAmount ?? 0)</p>
-                            </div>
-                            <div class="bg-surface-container rounded-xl p-4 text-center">
-                                <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Cost / Capita</p>
-                                <p class="font-headline-md text-headline-md text-on-surface">Rp @FormatCurrency(selectedApplication.Amount)</p>
-                            </div>
-                            <div class="bg-surface-container rounded-xl p-4 text-center">
-                                <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Status</p>
-                                @if (selectedApplication.Campaign?.IsActive == true)
-                                {
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed">
-                                        <span class="material-symbols-outlined text-[14px] mr-1">check_circle</span>
-                                        Active
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-label-sm font-label-sm bg-surface-variant text-on-surface-variant">
-                                        <span class="material-symbols-outlined text-[14px] mr-1">cancel</span>
-                                        Inactive
-                                    </span>
-                                }
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 p-6 mb-6">
-                        <h2 class="font-headline-md text-headline-md text-on-surface mb-4">Supporting Documents</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="flex items-center gap-4 bg-surface-container rounded-xl p-4">
-                                <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
-                                    <span class="material-symbols-outlined text-[20px] text-primary">description</span>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-label-md text-label-md text-on-surface truncate">Organization_Registration.pdf</p>
-                                    <p class="text-label-sm font-label-sm text-on-surface-variant">2.4 MB</p>
-                                </div>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed shrink-0">Verified</span>
-                            </div>
-                            <div class="flex items-center gap-4 bg-surface-container rounded-xl p-4">
-                                <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
-                                    <span class="material-symbols-outlined text-[20px] text-primary">description</span>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-label-md text-label-md text-on-surface truncate">Financial_Statement_2025.xlsx</p>
-                                    <p class="text-label-sm font-label-sm text-on-surface-variant">1.8 MB</p>
-                                </div>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed shrink-0">Verified</span>
-                            </div>
-                            <div class="flex items-center gap-4 bg-surface-container rounded-xl p-4">
-                                <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
-                                    <span class="material-symbols-outlined text-[20px] text-primary">description</span>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-label-md text-label-md text-on-surface truncate">Project_Proposal.pdf</p>
-                                    <p class="text-label-sm font-label-sm text-on-surface-variant">3.1 MB</p>
-                                </div>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-[#fef3c7] text-[#92400e] shrink-0">Under Review</span>
-                            </div>
-                            <div class="flex items-center gap-4 bg-surface-container rounded-xl p-4">
-                                <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center shrink-0">
-                                    <span class="material-symbols-outlined text-[20px] text-primary">description</span>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-label-md text-label-md text-on-surface truncate">Impact_Assessment.pdf</p>
-                                    <p class="text-label-sm font-label-sm text-on-surface-variant">1.2 MB</p>
-                                </div>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-label-sm font-label-sm bg-surface-variant text-on-surface-variant shrink-0">Pending</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            }
-
-        </main>
-
-        @if (selectedApplication != null)
-        {
-            <aside class="hidden xl:flex flex-col w-80 border-l border-outline-variant/30 bg-surface-container-lowest p-gutter shrink-0 overflow-y-auto">
-
-                <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 p-6 mb-4">
-                    <h3 class="font-headline-md text-headline-md text-on-surface mb-4">Final Decision</h3>
-                    <button @onclick="ApproveApplication" class="w-full bg-tertiary-container text-on-tertiary hover:opacity-90 rounded-lg py-3 flex items-center justify-center gap-2 font-label-md text-label-md transition-opacity mb-3">
-                        <span class="material-symbols-outlined text-[20px]">check_circle</span>
-                        Approve Application
-                    </button>
-                    <button @onclick="RejectApplication" class="w-full border-2 border-error text-error hover:bg-error-container rounded-lg py-3 flex items-center justify-center gap-2 font-label-md text-label-md transition-colors mb-4">
-                        <span class="material-symbols-outlined text-[20px]">cancel</span>
-                        Reject Application
-                    </button>
-                    <div class="flex items-center gap-4 mb-4">
-                        <hr class="flex-1 border-outline-variant/30"/>
-                        <span class="text-label-sm font-label-sm text-on-surface-variant">OR</span>
-                        <hr class="flex-1 border-outline-variant/30"/>
-                    </div>
-                    <p class="text-label-md font-label-md text-on-surface mb-2">Request Data Revision</p>
-                    <textarea @bind="revisionNotes" rows="4" placeholder="Enter revision notes..." class="w-full rounded-lg border border-outline-variant/50 bg-surface-container p-3 text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none mb-3"></textarea>
-                    <button @onclick="SendRevisionRequest" class="w-full bg-primary text-on-primary rounded-lg py-2.5 font-label-md text-label-md hover:opacity-90 transition-opacity">
-                        Send Revision Request
-                    </button>
-                </div>
-
-                <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 p-6 mb-4">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-label-md text-label-md text-on-surface">KYC/AML Compliance</h3>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed">Passed</span>
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-[20px] text-tertiary">check_circle</span>
-                            <span class="text-body-md font-body-md text-on-surface">Identity Verified</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-[20px] text-tertiary">check_circle</span>
-                            <span class="text-body-md font-body-md text-on-surface">Sanctions Screening Clear</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-[20px] text-tertiary">check_circle</span>
-                            <span class="text-body-md font-body-md text-on-surface">PEP Check Negative</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-label-md text-label-md text-on-surface">AI Fraud Detection</h3>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-label-sm bg-tertiary-fixed text-on-tertiary-fixed">Low Risk</span>
-                    </div>
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-label-sm font-label-sm text-on-surface-variant">Risk Score</span>
-                        <span class="font-headline-md text-headline-md text-tertiary">12%</span>
-                    </div>
-                    <div class="w-full bg-surface-variant rounded-full h-2 mb-5">
-                        <div class="bg-tertiary rounded-full h-2" style="width: 12%"></div>
-                    </div>
-                    <p class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-3">Key Indicators</p>
-                    <div class="flex flex-col gap-3">
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
-                            <span class="text-label-md font-label-md text-on-surface">Transaction Pattern Normal</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
-                            <span class="text-label-md font-label-md text-on-surface">Device Fingerprint Valid</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-[18px] text-tertiary">check_circle</span>
-                            <span class="text-label-md font-label-md text-on-surface">Behavioral Analysis Clean</span>
-                        </div>
-                    </div>
-                </div>
-
-            </aside>
-        }
-
-    </div>
+        </div>
+    </main>
 
     <footer class="bg-surface-container-lowest border-t border-outline-variant/30 py-4">
         <p class="text-center text-label-sm font-label-sm text-on-surface-variant">&copy; 2026 HumanityFlow. Admin Panel v2.1</p>
@@ -434,7 +409,8 @@
     {
         try
         {
-            applications = await ApiService.GetAllDonationsAsync();
+            var all = await ApiService.GetAllDonationsAsync();
+            applications = all.Where(a => a.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase)).ToList();
         }
         catch
         {
@@ -458,27 +434,41 @@
 
     private async Task ApproveApplication()
     {
-        showSuccessMessage = true;
-        successMessage = "Application approved successfully";
-        StateHasChanged();
-        await Task.Delay(3000);
-        showSuccessMessage = false;
-        StateHasChanged();
+        if (selectedApplication != null)
+        {
+            var success = await ApiService.UpdateDonationStatusAsync(selectedApplication.Id, "verified");
+            if (success)
+            {
+                showSuccessMessage = true;
+                successMessage = "Application approved successfully";
+                var all = await ApiService.GetAllDonationsAsync();
+                applications = all.Where(a => a.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase)).ToList();
+                BackToQueue();
+                StateHasChanged();
+                await Task.Delay(3000);
+                showSuccessMessage = false;
+                StateHasChanged();
+            }
+        }
     }
 
     private async Task RejectApplication()
     {
         if (selectedApplication != null)
         {
-            await ApiService.DeleteDonationAsync(selectedApplication.Id);
-            applications = await ApiService.GetAllDonationsAsync();
-            BackToQueue();
-            showSuccessMessage = true;
-            successMessage = "Application rejected";
-            StateHasChanged();
-            await Task.Delay(3000);
-            showSuccessMessage = false;
-            StateHasChanged();
+            var success = await ApiService.UpdateDonationStatusAsync(selectedApplication.Id, "rejected");
+            if (success)
+            {
+                showSuccessMessage = true;
+                successMessage = "Application rejected";
+                var all = await ApiService.GetAllDonationsAsync();
+                applications = all.Where(a => a.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase)).ToList();
+                BackToQueue();
+                StateHasChanged();
+                await Task.Delay(3000);
+                showSuccessMessage = false;
+                StateHasChanged();
+            }
         }
     }
 
@@ -486,19 +476,23 @@
     {
         if (selectedApplication != null)
         {
-            var appName = selectedApplication.User?.Name ?? $"APP-{selectedApplication.Id}";
-            showSuccessMessage = true;
-            successMessage = $"Revision request sent to {appName}";
-            revisionNotes = "";
-            
-            var appId = selectedApplication.Id;
-            applications.RemoveAll(a => a.Id == appId);
-            BackToQueue();
-            
-            StateHasChanged();
-            await Task.Delay(3000);
-            showSuccessMessage = false;
-            StateHasChanged();
+            var success = await ApiService.UpdateDonationStatusAsync(selectedApplication.Id, "revision_requested");
+            if (success)
+            {
+                var appName = selectedApplication.User?.Name ?? $"APP-{selectedApplication.Id}";
+                showSuccessMessage = true;
+                successMessage = $"Revision request sent to {appName}";
+                revisionNotes = "";
+                
+                var all = await ApiService.GetAllDonationsAsync();
+                applications = all.Where(a => a.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase)).ToList();
+                BackToQueue();
+                
+                StateHasChanged();
+                await Task.Delay(3000);
+                showSuccessMessage = false;
+                StateHasChanged();
+            }
         }
     }
 

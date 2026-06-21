@@ -49,6 +49,9 @@ public class DonationModel
     [JsonPropertyName("amount")]
     public decimal Amount { get; set; }
 
+    [JsonPropertyName("status")]
+    public string Status { get; set; } = "Pending";
+
     [JsonPropertyName("user")]
     public UserModel? User { get; set; }
 
@@ -305,6 +308,19 @@ public class AdminApiService
         try
         {
             var response = await _httpClient.DeleteAsync($"api/donation/{id}");
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> UpdateDonationStatusAsync(int id, string status)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync($"api/donation/{id}/status", new { status = status });
             return response.IsSuccessStatusCode;
         }
         catch

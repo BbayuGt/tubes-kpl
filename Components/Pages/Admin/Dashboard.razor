@@ -563,9 +563,9 @@
             campaigns = await campaignsTask;
             donations = await donationsTask;
 
-            totalDonations = donations.Sum(d => d.Amount);
+            totalDonations = donations.Where(d => d.Status.Equals("verified", StringComparison.OrdinalIgnoreCase)).Sum(d => d.Amount);
             activeCampaigns = campaigns.Count(c => c.IsActive);
-            pendingVerifications = donations.Count;
+            pendingVerifications = donations.Count(d => d.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase));
 
             GenerateChartData();
             GenerateRecentActivities();

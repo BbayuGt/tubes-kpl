@@ -165,7 +165,7 @@
         <div class="flex items-center gap-3">
             <div class="hidden lg:flex items-center bg-surface-container rounded-lg px-3 py-2 gap-2 border border-outline-variant/30">
                 <span class="material-symbols-outlined text-on-surface-variant text-[20px]" style="font-variation-settings: 'FILL' 0;">search</span>
-                <input type="text" placeholder="Search donations..." class="bg-transparent border-none outline-none text-body-md text-on-surface w-48 placeholder:text-on-surface-variant/60" />
+                <input type="text" placeholder="Search donations..." @bind="searchQuery" @bind:event="oninput" @onkeyup="ApplyFilter" class="bg-transparent border-none outline-none text-body-md text-on-surface w-48 placeholder:text-on-surface-variant/60" />
             </div>
             <button class="relative p-2 rounded-lg hover:bg-surface-container transition-colors" title="Notifications">
                 <span class="material-symbols-outlined text-on-surface-variant text-[22px]" style="font-variation-settings: 'FILL' 0;">notifications</span>
@@ -611,8 +611,6 @@
     private void OpenProofModal() => showProofModal = true;
     private void CloseProofModal() => showProofModal = false;
 
-    private Dictionary<int, string> donationStatuses = new();
-
     private bool showToast = false;
     private string toastMessage = "";
     private string toastType = "success";
@@ -626,12 +624,6 @@
         try
         {
             allDonations = await ApiService.GetAllDonationsAsync();
-
-            foreach (var donation in allDonations)
-            {
-                donationStatuses[donation.Id] = "pending";
-            }
-
             ApplyFilter();
         }
         catch
@@ -647,8 +639,11 @@
 
     private string GetDonationStatus(int donationId)
     {
-        return donationStatuses.TryGetValue(donationId, out var status) ? status : "pending";
+        var donation = allDonations.FirstOrDefault(d => d.Id == donationId);
+        return donation?.Status?.ToLower() ?? "pending";
     }
+
+    private string searchQuery = "";
 
     private void SetFilter(string filter)
     {
@@ -658,12 +653,24 @@
 
     private void ApplyFilter()
     {
+        var query = allDonations.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            query = query.Where(d => 
+                (d.User?.Name?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (d.User?.Email?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (d.Campaign?.Title?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                d.Id.ToString().Contains(searchQuery)
+            );
+        }
+
         filteredDonations = activeFilter switch
         {
-            "pending" => allDonations.Where(d => GetDonationStatus(d.Id) == "pending").ToList(),
-            "verified" => allDonations.Where(d => GetDonationStatus(d.Id) == "verified").ToList(),
-            "rejected" => allDonations.Where(d => GetDonationStatus(d.Id) == "rejected").ToList(),
-            _ => allDonations.ToList()
+            "pending" => query.Where(d => GetDonationStatus(d.Id) == "pending").ToList(),
+            "verified" => query.Where(d => GetDonationStatus(d.Id) == "verified").ToList(),
+            "rejected" => query.Where(d => GetDonationStatus(d.Id) == "rejected").ToList(),
+            _ => query.ToList()
         };
     }
 
@@ -674,16 +681,40 @@
 
     private async Task ApproveDonation(int donationId)
     {
-        donationStatuses[donationId] = "verified";
-        ApplyFilter();
-        await ShowToast("Donation REF-" + donationId.ToString("D5") + " has been verified successfully.", "success");
+        var donation = allDonations.FirstOrDefault(d => d.Id == donationId);
+        if (donation != null)
+        {
+            var success = await ApiService.UpdateDonationStatusAsync(donationId, "verified");
+            if (success)
+            {
+                donation.Status = "verified";
+                ApplyFilter();
+                await ShowToast("Donation REF-" + donationId.ToString("D5") + " has been verified successfully.", "success");
+            }
+            else
+            {
+                await ShowToast("Failed to update status in backend.", "error");
+            }
+        }
     }
 
     private async Task RejectDonation(int donationId)
     {
-        donationStatuses[donationId] = "rejected";
-        ApplyFilter();
-        await ShowToast("Donation REF-" + donationId.ToString("D5") + " has been rejected.", "error");
+        var donation = allDonations.FirstOrDefault(d => d.Id == donationId);
+        if (donation != null)
+        {
+            var success = await ApiService.UpdateDonationStatusAsync(donationId, "rejected");
+            if (success)
+            {
+                donation.Status = "rejected";
+                ApplyFilter();
+                await ShowToast("Donation REF-" + donationId.ToString("D5") + " has been rejected.", "error");
+            }
+            else
+            {
+                await ShowToast("Failed to update status in backend.", "error");
+            }
+        }
     }
 
     private async Task ShowToast(string message, string type)
