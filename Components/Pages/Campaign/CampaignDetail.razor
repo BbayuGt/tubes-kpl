@@ -1,0 +1,295 @@
+@page "/CampaignDetail/{Id:int}"
+@using tubes_kpl.Models
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+
+<!DOCTYPE html>
+<html class="light" lang="en" style="">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>HumanityFlow - Campaign Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+            tailwind.config = {
+              darkMode: "class",
+              theme: {
+                extend: {
+                  "colors": {
+                          "secondary-container": "#e1e3e4",
+                          "on-primary-container": "#bbd0ff",
+                          "primary-fixed": "#d7e2ff",
+                          "surface-dim": "#d2dbe4",
+                          "tertiary-fixed-dim": "#66df75",
+                          "inverse-on-surface": "#e9f2fb",
+                          "surface-container-highest": "#dbe4ed",
+                          "on-tertiary-fixed": "#002106",
+                          "surface-container": "#e6eff8",
+                          "secondary": "#5c5f60",
+                          "tertiary": "#004c17",
+                          "on-primary-fixed-variant": "#004491",
+                          "surface-container-low": "#ecf5fe",
+                          "surface-bright": "#f6faff",
+                          "on-secondary-fixed-variant": "#454748",
+                          "tertiary-container": "#006722",
+                          "surface": "#f6faff",
+                          "on-error-container": "#93000a",
+                          "surface-container-lowest": "#ffffff",
+                          "on-secondary-container": "#626566",
+                          "primary-fixed-dim": "#acc7ff",
+                          "on-surface-variant": "#424752",
+                          "on-tertiary-container": "#6fe87c",
+                          "surface-variant": "#dbe4ed",
+                          "outline-variant": "#c2c6d4",
+                          "on-surface": "#141d23",
+                          "on-primary-fixed": "#001a40",
+                          "inverse-surface": "#293138",
+                          "on-background": "#141d23",
+                          "primary-container": "#0056b3",
+                          "on-secondary": "#ffffff",
+                          "secondary-fixed-dim": "#c5c7c8",
+                          "surface-container-high": "#e0e9f2",
+                          "error-container": "#ffdad6",
+                          "tertiary-fixed": "#83fc8e",
+                          "error": "#ba1a1a",
+                          "surface-tint": "#115cb9",
+                          "outline": "#727784",
+                          "inverse-primary": "#acc7ff",
+                          "background": "#f6faff",
+                          "on-primary": "#ffffff",
+                          "on-tertiary-fixed-variant": "#00531a",
+                          "on-secondary-fixed": "#191c1d",
+                          "on-error": "#ffffff",
+                          "secondary-fixed": "#e1e3e4",
+                          "on-tertiary": "#ffffff",
+                          "primary": "#003f87"
+                  },
+                  "borderRadius": {
+                          "DEFAULT": "0.25rem",
+                          "lg": "0.5rem",
+                          "xl": "0.75rem",
+                          "full": "9999px"
+                  },
+                  "spacing": {
+                          "stack-md": "16px",
+                          "base": "8px",
+                          "gutter": "24px",
+                          "container-max": "1280px",
+                          "stack-sm": "8px",
+                          "stack-lg": "32px",
+                          "margin-desktop": "40px"
+                  },
+                  "fontFamily": {
+                          "label-md": ["Inter"],
+                          "display-lg": ["Inter"],
+                          "body-md": ["Inter"],
+                          "label-sm": ["Inter"],
+                          "headline-lg": ["Inter"],
+                          "headline-md": ["Inter"],
+                          "body-lg": ["Inter"]
+                  },
+                  "fontSize": {
+                          "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                          "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                          "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                          "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                          "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                          "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                          "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                  }
+                },
+              },
+            }
+    </script>
+    <style>
+            body {
+                background-color: #f6faff;
+                font-family: 'Inter', sans-serif;
+                color: #141d23;
+            }
+
+            .material-symbols-outlined {
+                font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            }
+
+            .progress-bar-fill {
+                transition: width 1s ease-out;
+            }
+
+            .sticky-card {
+                position: sticky;
+                top: 24px;
+            }
+
+            .glass-card {
+                background: rgba(255, 255, 255, 0.8);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+            }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+    <!-- Top Navigation Bar -->
+    <header class="bg-surface border-b border-outline-variant shadow-sm w-full h-16 sticky top-0 z-50">
+        <div class="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto h-full">
+            <div class="font-headline-md text-headline-md font-bold text-primary cursor-pointer active:scale-95 transition-transform">
+                HumanityFlow
+            </div>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1 transition-colors" href="#">Explore</a>
+                <a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors" href="#">Impact</a>
+                <a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors" href="#">Transparency</a>
+                <a class="font-label-md text-label-md text-secondary hover:text-primary transition-colors" href="#">About</a>
+            </nav>
+            <div class="flex items-center gap-gutter">
+                <div class="hidden md:block">
+                    <button class="font-label-md text-label-md bg-primary text-on-primary px-6 py-2 rounded-lg font-bold cursor-pointer active:scale-95 transition-transform">
+                        Sign In
+                    </button>
+                </div>
+                <span class="material-symbols-outlined text-secondary md:hidden cursor-pointer" data-icon="menu">menu</span>
+            </div>
+        </div>
+    </header>
+    <main class="max-w-container-max mx-auto px-margin-desktop py-stack-lg">
+        @if (Campaign == null)
+        {
+            <div class="flex justify-center items-center py-20">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        }
+        else
+        {
+        <!-- Breadcrumb / Back Link -->
+        <div class="mb-stack-lg">
+            <a class="flex items-center gap-2 text-primary font-label-md text-label-md group" href="#">
+                <span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform" data-icon="arrow_back">arrow_back</span>
+                Back to Campaigns
+            </a>
+        </div>
+        <!-- Two Column Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+            <!-- Left Column: Content -->
+            <div class="md:col-span-8">
+                <!-- Hero Image -->
+                <div class="rounded-xl overflow-hidden shadow-sm mb-stack-lg bg-surface-container-high aspect-[16/9]">
+                    <img alt="Campaign Image" class="w-full h-full object-cover" src="@(string.IsNullOrEmpty(Campaign.ImageUrl) ? "https://placehold.co/800x450" : Campaign.ImageUrl)">
+                </div>
+                <!-- Campaign Title & Status -->
+                <div class="mb-stack-lg">
+                    <div class="flex items-center gap-base mb-base">
+                        <span class="bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-[#16A34A] @(Campaign.IsActive ? "animate-pulse" : "")"></span>
+                            @(Campaign.IsActive ? "Active" : "Completed")
+                        </span>
+
+                    </div>
+                    <h1 class="font-display-lg text-display-lg text-on-surface mb-stack-sm tracking-tight">@Campaign.Title</h1>
+                    <div class="flex items-center gap-base text-secondary font-label-md text-label-md">Created&nbsp; @Campaign.CreatedAt.ToString("yyyy-MM-dd")</div>
+                </div>
+                <!-- Description Section -->
+                <section class="prose max-w-none">
+                    <p class="font-body-lg text-body-lg text-on-surface-variant mb-6 leading-relaxed">
+                        @Campaign.Description
+                    </p>
+                </section>
+                <!-- Activity Feed (Design Hint) -->
+
+            </div>
+            <!-- Right Column: Sticky Donation Card -->
+            <div class="md:col-span-4 relative">
+                <div class="sticky-card bg-surface-container-lowest rounded-xl p-stack-lg shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-outline-variant">
+                    <!-- Progress Information -->
+                    <div class="mb-stack-md">
+                        <div class="flex justify-between items-end mb-2">
+                            <h3 class="font-headline-md text-headline-md text-primary">Rp @Campaign.CollectedAmount.ToString("N0")</h3>
+                            <span class="font-label-sm text-label-sm text-on-surface-variant">of Rp @Campaign.TargetAmount.ToString("N0")</span>
+                        </div>
+                        <!-- Success Green Progress Bar -->
+                        <div class="w-full h-2 bg-secondary-container rounded-full overflow-hidden mb-2">
+                            <div class="h-full bg-[#16A34A] rounded-full progress-bar-fill" style="width: @(Campaign.TargetAmount > 0 ? Math.Min(100, (double)Campaign.CollectedAmount / (double)Campaign.TargetAmount * 100).ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) : "0")%;"></div>
+                        </div>
+                        <div class="flex justify-between items-center text-label-sm font-label-sm text-on-surface-variant">
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="groups">groups</span> 1,240 Donors</span>
+                            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]" data-icon="schedule">schedule</span> 14 Days left</span>
+                        </div>
+                    </div>
+                    <!-- Preset Options (Design Hint from Style Guidance) -->
+                    <!-- Action Buttons -->
+                    <div class="space-y-3">
+                        <button class="w-full bg-primary text-on-primary py-4 rounded-lg font-bold font-label-md text-label-md hover:opacity-90 active:scale-[0.98] transition-all shadow-md">
+                            Donate Now
+                        </button>
+
+                    </div>
+                    <!-- Transparency Note -->
+                    <div class="mt-6 flex items-start gap-3 p-3 rounded-lg bg-surface-container-low border border-outline-variant">
+                        <span class="material-symbols-outlined text-primary" data-icon="verified">verified</span>
+                        <p class="text-label-sm text-on-surface-variant">Verified by HumanityFlow radical transparency engine. 100% impact guarantee.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    </main>
+    <!-- Footer -->
+    <footer class="bg-surface-container-low border-t border-outline-variant w-full py-stack-lg mt-stack-lg">
+        <div class="flex flex-col md:flex-row justify-between items-center px-margin-desktop max-w-container-max mx-auto gap-stack-md">
+            <div class="text-left">
+                <div class="font-headline-md text-headline-md font-bold text-primary mb-2">HumanityFlow</div>
+                <p class="font-body-md text-body-md text-on-surface-variant max-w-sm">© 2024 HumanityFlow. Radical transparency in humanitarian aid.</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-8">
+                <a class="font-body-md text-body-md text-on-surface-variant hover:underline transition-all" href="#">Privacy Policy</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:underline transition-all" href="#">Terms of Service</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:underline transition-all" href="#">Contact Support</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:underline transition-all font-bold" href="#">Annual Reports</a>
+            </div>
+        </div>
+    </footer>
+    <script>
+            // Micro-interaction for donation buttons
+            const donationButtons = document.querySelectorAll('.grid-cols-2 button');
+            donationButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    donationButtons.forEach(b => {
+                        b.classList.remove('border-primary', 'bg-primary-fixed-dim', 'text-primary');
+                        b.classList.add('border-outline-variant');
+                    });
+                    btn.classList.add('border-primary', 'bg-primary-fixed-dim', 'text-primary');
+                    btn.classList.remove('border-outline-variant');
+                });
+            });
+    </script>
+
+
+</body>
+</html>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public int DonationAmount { get; set; }
+
+    // Menggunakan nama lengkap agar tidak konflik dengan folder Campaign
+    public tubes_kpl.Models.Campaign? Campaign { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Panggil backend Anda
+            Campaign = await Http.GetFromJsonAsync<tubes_kpl.Models.Campaign>($"http://localhost:8080/api/Campaign/{Id}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching data: {ex.Message}");
+        }
+    }
+}
