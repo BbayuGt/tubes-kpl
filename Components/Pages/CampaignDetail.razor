@@ -1,0 +1,298 @@
+@page "/campaign-detail"
+
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>KindCapital | Emergency Food Relief for Families in Crisis</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#e1e3e4",
+                    "on-background": "#141d23",
+                    "inverse-on-surface": "#e9f2fb",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#191c1d",
+                    "surface-container-low": "#ecf5fe",
+                    "surface-container-high": "#e0e9f2",
+                    "secondary": "#5c5f60",
+                    "outline-variant": "#c2c6d4",
+                    "on-surface-variant": "#424752",
+                    "error-container": "#ffdad6",
+                    "primary-container": "#0056b3",
+                    "surface-dim": "#d2dbe4",
+                    "primary-fixed-dim": "#acc7ff",
+                    "on-tertiary-fixed-variant": "#00531a",
+                    "inverse-surface": "#293138",
+                    "surface-container-highest": "#dbe4ed",
+                    "secondary-fixed-dim": "#c5c7c8",
+                    "surface-container": "#e6eff8",
+                    "on-primary": "#ffffff",
+                    "on-secondary-container": "#626566",
+                    "primary-fixed": "#d7e2ff",
+                    "on-tertiary-fixed": "#002106",
+                    "on-secondary": "#ffffff",
+                    "background": "#f6faff",
+                    "tertiary-container": "#006722",
+                    "surface-bright": "#f6faff",
+                    "on-primary-container": "#bbd0ff",
+                    "surface-tint": "#115cb9",
+                    "tertiary-fixed": "#83fc8e",
+                    "outline": "#727784",
+                    "error": "#ba1a1a",
+                    "primary": "#003f87",
+                    "surface": "#f6faff",
+                    "on-secondary-fixed-variant": "#454748",
+                    "on-primary-fixed": "#001a40",
+                    "on-primary-fixed-variant": "#004491",
+                    "tertiary": "#004c17",
+                    "on-tertiary-container": "#6fe87c",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#acc7ff",
+                    "secondary-fixed": "#e1e3e4",
+                    "on-error-container": "#93000a",
+                    "on-surface": "#141d23",
+                    "tertiary-fixed-dim": "#66df75",
+                    "surface-variant": "#dbe4ed"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "stack-sm": "8px",
+                    "stack-md": "16px",
+                    "margin-desktop": "40px",
+                    "base": "8px",
+                    "stack-lg": "32px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .progress-bar-fill {
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sticky-sidebar {
+            top: 24px;
+        }
+        .custom-shadow-l1 { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
+        .custom-shadow-l2 { box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08); }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface">
+<!-- TopNavBar from JSON -->
+<header class="bg-surface-container-lowest dark:bg-surface-container-lowest border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none docked full-width top-0 sticky z-50">
+<div class="max-w-container-max mx-auto px-margin-desktop flex justify-between items-center h-20">
+<div class="flex items-center gap-stack-lg">
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim">KindCapital</span>
+
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="material-symbols-outlined text-secondary hover:text-primary transition-colors">notifications</button>
+<button class="material-symbols-outlined text-secondary hover:text-primary transition-colors">account_circle</button>
+<button class="bg-primary text-on-primary px-stack-md py-stack-sm rounded-lg font-label-md text-label-md hover:opacity-80 transition-opacity">Sign In</button>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-desktop py-stack-lg">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Left Column: Main Content -->
+<div class="md:col-span-8 space-y-stack-lg">
+<!-- Hero Section -->
+<div class="rounded-xl overflow-hidden custom-shadow-l1 bg-white">
+<div class="relative h-[480px]">
+<img class="w-full h-full object-cover" data-alt="A poignant, high-resolution humanitarian photograph showing a close-up of a diverse family sharing a simple, nutritious meal in a sunlit community center. The lighting is warm and hopeful, using soft natural light to create a sense of dignity and resilience. The visual style is professional photojournalism with a shallow depth of field, focusing on the genuine smiles and connection between family members. The color palette emphasizes soft earth tones and bright whites to align with the KindCapital modern fintech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_0pXeENWC3GbbfrARrcI2JUEkLZgs38PfcqoYZ2WFtdmlslXXOo4nr6NCZA9L4iyIef8iHAD_A_9kh904RD7LdNLKBVVS2yLZYKLv5iVg77dcC61uwNplYGRAalLq6HkPZJMlGNfgrbWY7Jb64bNoHV53YWeuuAFFTIivojLHWjc7ccUTSGO_3dV_KnkFL2e2LiYuEWTZ27B9r9qzKaGbs4sGMWAWLYLQBI6fVytyVw3xrEY0ozKCuUwX7R6mKqflYLvF4YIBYbU">
+<div class="absolute top-4 left-4">
+<span class="bg-surface-container-low text-primary-container px-3 py-1 rounded-full font-label-sm text-label-sm border border-primary-container/20">Emergency Response</span>
+</div>
+</div>
+</div>
+<!-- Campaign Info -->
+<article class="space-y-stack-md">
+<h1 class="font-display-lg text-display-lg text-on-background">Emergency Food Relief for Families in Crisis</h1>
+<div class="flex items-center gap-stack-sm">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">volunteer_activism</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Created by <span class="font-bold">KindCapital Relief Fund</span></p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-tertiary-container text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-sm text-label-sm text-tertiary-container">Verified Humanitarian Partner</span>
+</div>
+</div>
+</div>
+<div class="border-t border-outline-variant pt-stack-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-md">The Mission</h2>
+<div class="font-body-lg text-body-lg text-on-surface-variant space-y-stack-md leading-relaxed">
+<p class="">Global economic shifts and localized crises have left thousands of families without stable access to basic nutrition. This campaign is dedicated to establishing rapid-response food distribution hubs across the most affected regions.</p>
+<p class="">Every donation goes directly toward procurement and logistics of high-nutrition food parcels. We prioritize radical transparency—each transaction is logged on our impact ledger and audited by third-party financial institutions to ensure 100% of your gift reaches those in need.</p>
+<p class="">By leveraging KindCapital's fintech-grade infrastructure, we reduce administrative overhead to under 2%, ensuring that your empathy translates into tangible action faster than traditional non-profit models.</p>
+</div>
+</div>
+<!-- Impact Gallery / Extra Context -->
+<div class="grid grid-cols-2 gap-stack-md mt-stack-lg">
+<div class="aspect-video rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist infographic showing a logistics map of food distribution routes. The aesthetic is modern and data-driven, using KindCapital's primary blue and success green. The style is sharp, professional, and reflects a high-utility fintech interface with clear icons and thin lines." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCN44APxmpgyhLXmCH0Ob60rrihevJA_OGTw0aN3ZtUFtFlG_lmOpjuxRX2iwtEEhJcn7UdBFV7PhdrdmuSGZ-FR5SQJ6niEK2lyuma6MhQa0yU3CD67D3JsaGWNtpP7bTi1GgTdEOqGUfNKoLDqlcksfKLN2Ik8JDlTZleks6qYtruNso6oTYaZ3RvRzNZxc44qobxHX3vUh3vx7-zIriBgn-uhUgj5zi9dTymyuIhKV0ozpOXBcHIjOSgi39qoTzzaVSxdvksB6E">
+</div>
+<div class="aspect-video rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A documentary style photograph of local volunteers efficiently organizing boxes of fresh produce in a bright, clean warehouse. The lighting is airy and positive. The image captures the systematic and professional nature of the relief effort, emphasizing efficiency and scale." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB67pfBIOd_Nf5WXe9xzu2XPg5RTS6hp89mjPXVRdKnzIzvzbwpAPaHn7XBeHVF9m6i5uNbm4elCjIUXjbnmmBVBu2szN1eOuERC6yxrKcGrXl-y12JSq0dYLp4r7MWnKI9WzYusBG2oT8vj9WRuXRh8ouVkt2qFQHx0Q_1jU3NRY5Txx1tqiuvrjzVlt82ytqVq5vz4LBx-kaM0CMBhjlGCLnY3pE4I02nkFZ8JhbX6BpDQjfuy6k6Kvzar7Ew_11-fxAWV0X7ZXo">
+</div>
+</div>
+</article>
+<!-- Activity Feed -->
+<section class="mt-stack-lg border-t border-outline-variant pt-stack-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-md">Recent Activity</h3>
+<div class="space-y-stack-sm">
+<div class="flex items-center justify-between p-stack-md bg-surface-container rounded-lg border border-outline-variant/30">
+<div class="flex items-center gap-stack-md">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-lg">person</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">John Doe</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">2 mins ago</p>
+</div>
+</div>
+<p class="font-label-md text-label-md text-primary font-bold">Rp 100,000</p>
+</div>
+<div class="flex items-center justify-between p-stack-md bg-surface-container rounded-lg border border-outline-variant/30">
+<div class="flex items-center gap-stack-md">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-lg">visibility_off</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Anonymous</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">5 mins ago</p>
+</div>
+</div>
+<p class="font-label-md text-label-md text-primary font-bold">Rp 50,000</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Donation Sidebar -->
+<aside class="md:col-span-4">
+<div class="sticky sticky-sidebar space-y-stack-md">
+<div class="bg-surface-container-lowest rounded-xl p-stack-lg custom-shadow-l2 border border-outline-variant/20">
+<div class="space-y-stack-md">
+<div class="flex justify-between items-end">
+<div>
+<span class="font-display-lg text-[28px] leading-tight text-on-surface font-bold">Rp 75,000,000</span>
+<p class="font-label-md text-label-md text-on-surface-variant">raised of Rp 100,000,000</p>
+</div>
+<span class="font-label-md text-label-md text-tertiary font-bold">75%</span>
+</div>
+<div class="w-full h-2 bg-secondary-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-container progress-bar-fill" style="width: 75%;"></div>
+</div>
+<div class="flex justify-between py-stack-md border-y border-outline-variant">
+<div class="text-center flex-1 border-r border-outline-variant">
+<p class="font-headline-md text-headline-md text-on-surface">1,250</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Donors</p>
+</div>
+<div class="text-center flex-1">
+<p class="font-headline-md text-headline-md text-on-surface">15</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Days Left</p>
+</div>
+</div>
+<div class="space-y-stack-sm pt-stack-md">
+<button class="w-full bg-primary-container text-on-primary py-stack-md rounded-lg font-label-md text-label-md font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-xl">favorite</span>
+                                    Donate Now
+                                </button>
+<button class="w-full bg-transparent border border-primary text-primary py-stack-md rounded-lg font-label-md text-label-md font-bold hover:bg-primary-fixed/20 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-xl">share</span>
+                                    Share Campaign
+                                </button>
+</div>
+<div class="flex items-start gap-stack-sm pt-stack-md bg-surface-container-low p-stack-md rounded-lg">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5">lock</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-tight">
+                                    All transactions are securely encrypted and audited. KindCapital uses institutional-grade security standards.
+                                </p>
+</div>
+</div>
+</div>
+<!-- Impact Chip / Verification Card -->
+<div class="bg-surface-container rounded-xl p-stack-md border border-outline-variant/30 flex items-center gap-stack-md">
+<div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center custom-shadow-l1">
+<span class="material-symbols-outlined text-tertiary text-2xl">verified_user</span>
+</div>
+<div>
+<p class="font-label-md text-label-md font-bold text-on-surface">Transparency Pro</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Real-time impact tracking enabled</p>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Footer from JSON -->
+<footer class="bg-surface-dim dark:bg-inverse-surface full-width mt-stack-lg border-t border-outline-variant/10">
+<div class="max-w-container-max mx-auto px-margin-desktop py-stack-lg flex flex-col md:flex-row justify-between items-center gap-gutter">
+<div class="flex flex-col gap-2">
+<span class="text-headline-sm font-headline-sm font-bold text-on-surface dark:text-inverse-on-surface">KindCapital</span>
+<p class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant max-w-sm">Empowering humanitarian impact through radical transparency and fintech-grade efficiency.</p>
+</div>
+<div class="flex flex-col md:items-end gap-stack-md">
+<div class="flex flex-wrap gap-stack-md justify-center">
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-label-sm text-label-sm" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-label-sm text-label-sm" href="#">Terms of Service</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-label-sm text-label-sm" href="#">Annual Reports</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-label-sm text-label-sm" href="#">Security Standard</a>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant dark:text-surface-variant">© 2024 KindCapital Humanitarian. All transactions are encrypted and audited.</p>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interaction for Progress Bar
+        window.addEventListener('DOMContentLoaded', () => {
+            const bar = document.querySelector('.progress-bar-fill');
+            if (bar) {
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = '75%';
+                }, 300);
+            }
+        });
+    </script>
+
+
+</body></html>
