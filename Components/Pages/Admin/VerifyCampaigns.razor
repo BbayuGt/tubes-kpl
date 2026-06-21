@@ -1,0 +1,613 @@
+@page "/admin/campaigns"
+@rendermode InteractiveServer
+@using tubes_kpl.Services
+@inject AdminApiService ApiService
+
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <title>Campaign Verification - HumanityFlow Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#bbd0ff", "on-error-container": "#93000a",
+                        "on-background": "#141d23", "error-container": "#ffdad6",
+                        "background": "#f6faff", "on-secondary-fixed-variant": "#454748",
+                        "on-tertiary-fixed": "#002106", "inverse-surface": "#293138",
+                        "tertiary": "#004c17", "surface-bright": "#f6faff",
+                        "outline-variant": "#c2c6d4", "surface-variant": "#dbe4ed",
+                        "surface-dim": "#d2dbe4", "on-surface-variant": "#424752",
+                        "on-secondary-container": "#626566", "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#6fe87c", "secondary-container": "#e1e3e4",
+                        "inverse-primary": "#acc7ff", "tertiary-container": "#006722",
+                        "surface-container-high": "#e0e9f2", "on-tertiary": "#ffffff",
+                        "secondary": "#5c5f60", "outline": "#727784",
+                        "secondary-fixed": "#e1e3e4", "surface-container-highest": "#dbe4ed",
+                        "error": "#ba1a1a", "on-primary-fixed": "#001a40",
+                        "primary-container": "#0056b3", "surface-tint": "#115cb9",
+                        "on-primary": "#ffffff", "primary": "#003f87",
+                        "on-surface": "#141d23", "on-error": "#ffffff",
+                        "tertiary-fixed": "#83fc8e", "surface-container-low": "#ecf5fe",
+                        "surface-container": "#e6eff8", "surface": "#f6faff",
+                        "primary-fixed-dim": "#acc7ff", "primary-fixed": "#d7e2ff",
+                        "inverse-on-surface": "#e9f2fb", "tertiary-fixed-dim": "#66df75",
+                        "on-tertiary-fixed-variant": "#00531a", "on-secondary-fixed": "#191c1d",
+                        "secondary-fixed-dim": "#c5c7c8", "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#004491"
+                    },
+                    "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                    "spacing": { "stack-lg": "32px", "stack-sm": "8px", "stack-md": "16px", "gutter": "24px", "margin-desktop": "40px", "base": "8px", "container-max": "1280px" },
+                    "fontFamily": { "headline-md": ["Inter"], "headline-lg": ["Inter"], "display-lg": ["Inter"], "label-sm": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "body-lg": ["Inter"] },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .shadow-ambient-1 { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
+        .shadow-ambient-2 { box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08); }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+
+    @if (showSuccessMessage)
+    {
+        <div class="fixed top-6 right-6 z-50 bg-tertiary-container text-on-tertiary px-6 py-3 rounded-xl shadow-ambient-2 flex items-center gap-3">
+            <span class="material-symbols-outlined text-[20px]">check_circle</span>
+            <span class="font-label-md">@successMessage</span>
+        </div>
+    }
+
+    
+    <nav class="bg-surface-container-lowest border-b border-outline-variant/30 sticky top-0 z-40">
+        <div class="max-w-[1280px] mx-auto px-margin-desktop flex items-center justify-between h-16">
+            <div class="flex items-center gap-8">
+                <a href="/admin" class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary" style="font-size:28px;">volunteer_activism</span>
+                    <span class="text-headline-md text-primary font-bold tracking-tight">HumanityFlow</span>
+                </a>
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="/admin" class="px-4 py-2 rounded-lg text-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors">Overview</a>
+                    <a href="/admin/campaigns" class="px-4 py-2 rounded-lg text-label-md text-primary bg-primary-fixed/30 border-b-2 border-primary font-semibold transition-colors">Campaigns</a>
+                    <a href="/admin/donations" class="px-4 py-2 rounded-lg text-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors">Donations</a>
+                    <a href="/admin/applicants" class="px-4 py-2 rounded-lg text-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors">Applicants</a>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button class="p-2 rounded-full hover:bg-surface-container-high transition-colors" title="Search">
+                    <span class="material-symbols-outlined text-on-surface-variant" style="font-size:22px;">search</span>
+                </button>
+                <button class="p-2 rounded-full hover:bg-surface-container-high transition-colors relative" title="Notifications">
+                    <span class="material-symbols-outlined text-on-surface-variant" style="font-size:22px;">notifications</span>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+                </button>
+                <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-on-primary text-label-md font-semibold ml-1 cursor-pointer">
+                    A
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    
+    <main class="flex-1 max-w-[1280px] mx-auto w-full px-margin-desktop py-stack-lg">
+
+        
+        <div class="mb-stack-lg">
+            <div class="flex items-center gap-3 mb-2">
+                <span class="material-symbols-outlined text-primary" style="font-size:32px;">campaign</span>
+                <h1 class="text-headline-lg text-on-surface">Campaign Verification</h1>
+            </div>
+            <p class="text-body-md text-on-surface-variant">Review and manage fundraising campaign requests</p>
+        </div>
+
+        
+        <div class="flex items-center gap-2 mb-gutter flex-wrap">
+            <button @onclick='() => SetFilter("all")'
+                    class="@(activeFilter == "all" ? "bg-primary text-on-primary shadow-ambient-1" : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest") px-4 py-2 rounded-full text-label-md font-semibold transition-all duration-200">
+                All <span class="ml-1 opacity-80">(@allCampaigns.Count)</span>
+            </button>
+            <button @onclick='() => SetFilter("active")'
+                    class="@(activeFilter == "active" ? "bg-primary text-on-primary shadow-ambient-1" : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest") px-4 py-2 rounded-full text-label-md font-semibold transition-all duration-200">
+                Active <span class="ml-1 opacity-80">(@activeCampaigns.Count)</span>
+            </button>
+            <button @onclick='() => SetFilter("reviewing")'
+                    class="@(activeFilter == "reviewing" ? "bg-primary text-on-primary shadow-ambient-1" : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest") px-4 py-2 rounded-full text-label-md font-semibold transition-all duration-200">
+                Reviewing <span class="ml-1 opacity-80">(@reviewingCampaigns.Count)</span>
+            </button>
+            <button @onclick='() => SetFilter("drafts")'
+                    class="@(activeFilter == "drafts" ? "bg-primary text-on-primary shadow-ambient-1" : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest") px-4 py-2 rounded-full text-label-md font-semibold transition-all duration-200">
+                Drafts <span class="ml-1 opacity-80">(@draftCampaigns.Count)</span>
+            </button>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="flex items-center justify-center py-20">
+                <div class="flex flex-col items-center gap-4">
+                    <div class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                    <p class="text-body-md text-on-surface-variant">Loading campaigns...</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-gutter">
+
+                
+                <div class="lg:col-span-2">
+                    <div class="max-h-[calc(100vh-300px)] overflow-y-auto pr-1 space-y-3 scrollbar-thin">
+                        @if (filteredCampaigns.Count == 0)
+                        {
+                            <div class="flex flex-col items-center justify-center py-16 text-center">
+                                <span class="material-symbols-outlined text-outline-variant mb-3" style="font-size:48px;">inbox</span>
+                                <p class="text-body-md text-on-surface-variant">No campaigns found in this category</p>
+                            </div>
+                        }
+                        else
+                        {
+                            @foreach (var campaign in filteredCampaigns)
+                            {
+                                var status = GetStatus(campaign);
+                                var isSelected = selectedCampaign?.Id == campaign.Id;
+                                <div @onclick="() => SelectCampaign(campaign)"
+                                     class="@(isSelected ? "ring-2 ring-primary border-primary shadow-ambient-2" : "border-outline-variant/40 hover:border-outline-variant hover:shadow-ambient-1") rounded-xl border p-4 cursor-pointer transition-all duration-200 bg-surface-container-lowest">
+
+                                    <div class="flex items-center justify-between mb-2">
+                                        @if (status == "ACTIVE")
+                                        {
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm bg-tertiary-fixed text-on-tertiary-fixed">
+                                                <span class="material-symbols-outlined" style="font-size:14px;">check_circle</span>
+                                                ACTIVE
+                                            </span>
+                                        }
+                                        else if (status == "REVIEWING")
+                                        {
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm bg-primary-fixed text-on-primary-fixed">
+                                                <span class="material-symbols-outlined" style="font-size:14px;">pending</span>
+                                                REVIEWING
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm bg-secondary-container text-on-secondary-container">
+                                                <span class="material-symbols-outlined" style="font-size:14px;">edit_note</span>
+                                                DRAFT
+                                            </span>
+                                        }
+                                        <span class="text-label-sm text-on-surface-variant">@GetTimeAgo(campaign.CreatedAt)</span>
+                                    </div>
+
+                                    <h3 class="text-body-md font-semibold text-on-surface mb-1 line-clamp-1">@campaign.Title</h3>
+                                    <p class="text-label-md text-on-surface-variant line-clamp-2 mb-3">@campaign.Description</p>
+
+                                    @if (status == "ACTIVE")
+                                    {
+                                        var progress = GetProgress(campaign);
+                                        <div class="mt-2">
+                                            <div class="flex items-center justify-between text-label-sm mb-1">
+                                                <span class="text-on-surface-variant">@FormatCurrency(campaign.CollectedAmount) raised</span>
+                                                <span class="text-primary font-semibold">@progress%</span>
+                                            </div>
+                                            <div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+                                                <div class="h-full bg-primary rounded-full transition-all duration-500" style="width: @(Math.Min(progress, 100))%"></div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                
+                <div class="lg:col-span-3">
+                    @if (selectedCampaign == null)
+                    {
+                        <div class="flex flex-col items-center justify-center h-full min-h-[400px] bg-surface-container-lowest rounded-xl border border-outline-variant/40">
+                            <span class="material-symbols-outlined text-outline-variant mb-4" style="font-size:64px;">description</span>
+                            <p class="text-body-lg text-on-surface-variant font-medium">Select a campaign to review</p>
+                            <p class="text-label-md text-outline mt-1">Click on a campaign card from the list</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/40 overflow-hidden shadow-ambient-1">
+
+                            
+                            <div class="bg-gradient-to-br from-primary to-primary-container p-6 relative overflow-hidden">
+                                <div class="absolute inset-0 opacity-10">
+                                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-white rounded-full"></div>
+                                    <div class="absolute -bottom-8 -left-8 w-32 h-32 bg-white rounded-full"></div>
+                                </div>
+                                <div class="relative z-10">
+                                    <div class="flex items-center gap-2 mb-3">
+                                        @{
+                                            var selStatus = GetStatus(selectedCampaign);
+                                        }
+                                        @if (selStatus == "ACTIVE")
+                                        {
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm bg-white/20 text-white backdrop-blur-sm">
+                                                <span class="material-symbols-outlined" style="font-size:14px;">check_circle</span>
+                                                ACTIVE
+                                            </span>
+                                        }
+                                        else if (selStatus == "REVIEWING")
+                                        {
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm bg-white/20 text-white backdrop-blur-sm">
+                                                <span class="material-symbols-outlined" style="font-size:14px;">pending</span>
+                                                REVIEWING
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-label-sm bg-white/20 text-white backdrop-blur-sm">
+                                                <span class="material-symbols-outlined" style="font-size:14px;">edit_note</span>
+                                                DRAFT
+                                            </span>
+                                        }
+                                    </div>
+                                    <h2 class="text-headline-md text-white mb-2">@selectedCampaign.Title</h2>
+                                    <p class="text-body-md text-white/80 line-clamp-3">@selectedCampaign.Description</p>
+                                </div>
+                            </div>
+
+                            <div class="p-6 space-y-6">
+
+                                
+                                <div class="bg-surface-container rounded-xl p-4">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <span class="material-symbols-outlined text-primary" style="font-size:24px;">payments</span>
+                                        <span class="text-label-md text-on-surface-variant font-semibold">Funding Overview</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-label-sm text-on-surface-variant mb-1">Target Amount</p>
+                                            <p class="text-headline-md text-on-surface">@FormatCurrency(selectedCampaign.TargetAmount)</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-label-sm text-on-surface-variant mb-1">Collected</p>
+                                            <p class="text-headline-md text-tertiary">@FormatCurrency(selectedCampaign.CollectedAmount)</p>
+                                        </div>
+                                    </div>
+                                    @{
+                                        var detailProgress = GetProgress(selectedCampaign);
+                                    }
+                                    <div class="mt-4">
+                                        <div class="flex items-center justify-between text-label-sm mb-1.5">
+                                            <span class="text-on-surface-variant">Progress</span>
+                                            <span class="text-primary font-semibold">@detailProgress%</span>
+                                        </div>
+                                        <div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+                                            <div class="h-full bg-gradient-to-r from-primary to-tertiary rounded-full transition-all duration-500" style="width: @(Math.Min(detailProgress, 100))%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                
+                                <div>
+                                    <div class="flex items-center gap-2 mb-3">
+                                        <span class="material-symbols-outlined text-primary" style="font-size:22px;">folder_open</span>
+                                        <h3 class="text-label-md text-on-surface font-semibold">Documentation</h3>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between bg-surface-container rounded-lg px-4 py-3">
+                                            <div class="flex items-center gap-3">
+                                                <span class="material-symbols-outlined text-primary" style="font-size:20px;">attach_file</span>
+                                                <div>
+                                                    <p class="text-body-md text-on-surface font-medium">Organization Registration</p>
+                                                    <p class="text-label-sm text-on-surface-variant">PDF Document</p>
+                                                </div>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label-sm bg-tertiary-fixed text-on-tertiary-fixed">
+                                                <span class="material-symbols-outlined" style="font-size:14px;">verified</span>
+                                                Verified
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center justify-between bg-surface-container rounded-lg px-4 py-3">
+                                            <div class="flex items-center gap-3">
+                                                <span class="material-symbols-outlined text-primary" style="font-size:20px;">attach_file</span>
+                                                <div>
+                                                    <p class="text-body-md text-on-surface font-medium">Financial Statement</p>
+                                                    <p class="text-label-sm text-on-surface-variant">PDF Document</p>
+                                                </div>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label-sm bg-tertiary-fixed text-on-tertiary-fixed">
+                                                <span class="material-symbols-outlined" style="font-size:14px;">verified</span>
+                                                Verified
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center justify-between bg-surface-container rounded-lg px-4 py-3">
+                                            <div class="flex items-center gap-3">
+                                                <span class="material-symbols-outlined text-primary" style="font-size:20px;">attach_file</span>
+                                                <div>
+                                                    <p class="text-body-md text-on-surface font-medium">Project Proposal</p>
+                                                    <p class="text-label-sm text-on-surface-variant">PDF Document</p>
+                                                </div>
+                                            </div>
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-label-sm bg-tertiary-fixed text-on-tertiary-fixed">
+                                                <span class="material-symbols-outlined" style="font-size:14px;">verified</span>
+                                                Verified
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                
+                                <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="material-symbols-outlined text-amber-600" style="font-size:22px;">warning</span>
+                                        <h3 class="text-label-md text-amber-800 font-semibold">Risk Assessment</h3>
+                                    </div>
+                                    <ul class="space-y-1.5 text-body-md text-amber-700">
+                                        <li class="flex items-start gap-2">
+                                            <span class="material-symbols-outlined mt-0.5" style="font-size:16px;">arrow_right</span>
+                                            <span>Organization has limited operational history (less than 2 years).</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="material-symbols-outlined mt-0.5" style="font-size:16px;">arrow_right</span>
+                                            <span>Target amount exceeds typical range for similar campaigns.</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="material-symbols-outlined mt-0.5" style="font-size:16px;">arrow_right</span>
+                                            <span>Recommend additional due diligence on fund allocation plan.</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                
+                                <div class="flex items-center gap-3 pt-2 flex-wrap">
+                                    <button @onclick="OpenRevisionModal"
+                                            class="flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-primary text-primary text-label-md font-semibold hover:bg-primary-fixed/30 transition-all duration-200">
+                                        <span class="material-symbols-outlined" style="font-size:18px;">edit_note</span>
+                                        Request Data Revision
+                                    </button>
+                                    <button @onclick="RejectCampaign"
+                                            class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-error text-on-error text-label-md font-semibold hover:bg-error/90 transition-all duration-200 shadow-ambient-1">
+                                        <span class="material-symbols-outlined" style="font-size:18px;">close</span>
+                                        Reject
+                                    </button>
+                                    <button @onclick="ApproveCampaign"
+                                            class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-tertiary text-on-tertiary text-label-md font-semibold hover:bg-tertiary/90 transition-all duration-200 shadow-ambient-1">
+                                        <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>
+                                        Approve Campaign
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </main>
+
+    
+    <footer class="border-t border-outline-variant/30 py-6 mt-auto">
+        <div class="max-w-[1280px] mx-auto px-margin-desktop text-center">
+            <p class="text-label-md text-on-surface-variant">&copy; 2026 HumanityFlow. Admin Panel v2.1</p>
+        </div>
+    </footer>
+
+    
+    @if (showRevisionModal)
+    {
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" @onclick="CloseRevisionModal">
+            <div class="bg-surface-container-lowest rounded-2xl shadow-ambient-2 w-full max-w-lg mx-4 p-6" @onclick:stopPropagation="true">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary" style="font-size:22px;">edit_note</span>
+                    </div>
+                    <div>
+                        <h3 class="text-headline-md text-on-surface">Request Data Revision</h3>
+                        <p class="text-label-md text-on-surface-variant">Send revision notes to the campaign organizer</p>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-label-md text-on-surface-variant mb-2 font-semibold">Revision Notes</label>
+                    <textarea @bind="revisionNotes"
+                              rows="5"
+                              placeholder="Describe the changes or additional information required..."
+                              class="w-full rounded-xl border border-outline-variant/60 bg-surface-container px-4 py-3 text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 resize-none"></textarea>
+                </div>
+                <div class="flex items-center justify-end gap-3">
+                    <button @onclick="CloseRevisionModal"
+                            class="px-5 py-2.5 rounded-xl border border-outline-variant text-label-md text-on-surface-variant font-semibold hover:bg-surface-container-high transition-all duration-200">
+                        Cancel
+                    </button>
+                    <button @onclick="SubmitRevision"
+                            class="px-5 py-2.5 rounded-xl bg-primary text-on-primary text-label-md font-semibold hover:bg-primary/90 transition-all duration-200 shadow-ambient-1">
+                        <span class="flex items-center gap-2">
+                            <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+                            Send
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+</body>
+</html>
+
+@code {
+    private List<CampaignModel> allCampaigns = new();
+    private CampaignModel? selectedCampaign;
+    private string activeFilter = "all";
+    private bool showRevisionModal = false;
+    private string revisionNotes = "";
+    private bool isLoading = true;
+    private bool showSuccessMessage = false;
+    private string successMessage = "";
+
+    private async Task SubmitRevision()
+    {
+        if (selectedCampaign == null) return;
+        
+        selectedCampaign.IsActive = false;
+        var result = await ApiService.UpdateCampaignAsync(selectedCampaign.Id, selectedCampaign);
+        
+        CloseRevisionModal();
+        
+        if (result)
+        {
+            successMessage = $"Revision request sent for '{selectedCampaign.Title}'";
+            showSuccessMessage = true;
+            StateHasChanged();
+            
+            var campaigns = await ApiService.GetAllCampaignsAsync();
+            if (campaigns != null)
+            {
+                allCampaigns = campaigns;
+            }
+            selectedCampaign = allCampaigns.FirstOrDefault(c => c.Id == selectedCampaign?.Id);
+            
+            await Task.Delay(3000);
+            showSuccessMessage = false;
+            StateHasChanged();
+        }
+    }
+
+    private List<CampaignModel> activeCampaigns => allCampaigns.Where(c => GetStatus(c) == "ACTIVE").ToList();
+    private List<CampaignModel> reviewingCampaigns => allCampaigns.Where(c => GetStatus(c) == "REVIEWING").ToList();
+    private List<CampaignModel> draftCampaigns => allCampaigns.Where(c => GetStatus(c) == "DRAFT").ToList();
+
+    private List<CampaignModel> filteredCampaigns => activeFilter switch
+    {
+        "active" => activeCampaigns,
+        "reviewing" => reviewingCampaigns,
+        "drafts" => draftCampaigns,
+        _ => allCampaigns
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var campaigns = await ApiService.GetAllCampaignsAsync();
+            if (campaigns != null)
+            {
+                allCampaigns = campaigns;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading campaigns: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private string GetStatus(CampaignModel c)
+    {
+        if (c.IsActive && c.CollectedAmount > 0)
+            return "ACTIVE";
+        if (c.IsActive && c.CollectedAmount == 0)
+            return "REVIEWING";
+        return "DRAFT";
+    }
+
+    private string GetTimeAgo(DateTime date)
+    {
+        var span = DateTime.Now - date;
+
+        if (span.TotalMinutes < 1)
+            return "Just now";
+        if (span.TotalMinutes < 60)
+            return $"{(int)span.TotalMinutes}m ago";
+        if (span.TotalHours < 24)
+            return $"{(int)span.TotalHours}h ago";
+        if (span.TotalDays < 7)
+            return $"{(int)span.TotalDays}d ago";
+        if (span.TotalDays < 30)
+            return $"{(int)(span.TotalDays / 7)}w ago";
+        if (span.TotalDays < 365)
+            return $"{(int)(span.TotalDays / 30)}mo ago";
+        return $"{(int)(span.TotalDays / 365)}y ago";
+    }
+
+    private void SelectCampaign(CampaignModel c)
+    {
+        selectedCampaign = c;
+    }
+
+    private void SetFilter(string filter)
+    {
+        activeFilter = filter;
+        selectedCampaign = null;
+    }
+
+    private async Task ApproveCampaign()
+    {
+        if (selectedCampaign == null) return;
+
+        selectedCampaign.IsActive = true;
+        var result = await ApiService.UpdateCampaignAsync(selectedCampaign.Id, selectedCampaign);
+        if (result)
+        {
+            var campaigns = await ApiService.GetAllCampaignsAsync();
+            if (campaigns != null)
+            {
+                allCampaigns = campaigns;
+            }
+            selectedCampaign = allCampaigns.FirstOrDefault(c => c.Id == selectedCampaign?.Id);
+        }
+    }
+
+    private async Task RejectCampaign()
+    {
+        if (selectedCampaign == null) return;
+
+        var campaignId = selectedCampaign.Id;
+        var result = await ApiService.DeleteCampaignAsync(campaignId);
+        if (result)
+        {
+            selectedCampaign = null;
+            var campaigns = await ApiService.GetAllCampaignsAsync();
+            if (campaigns != null)
+            {
+                allCampaigns = campaigns;
+            }
+        }
+    }
+
+    private void OpenRevisionModal()
+    {
+        revisionNotes = "";
+        showRevisionModal = true;
+    }
+
+    private void CloseRevisionModal()
+    {
+        showRevisionModal = false;
+    }
+
+    private string FormatCurrency(decimal amount)
+    {
+        return "Rp " + amount.ToString("N0");
+    }
+
+    private int GetProgress(CampaignModel c)
+    {
+        if (c.TargetAmount == 0) return 0;
+        return (int)Math.Round((c.CollectedAmount / c.TargetAmount) * 100);
+    }
+}
