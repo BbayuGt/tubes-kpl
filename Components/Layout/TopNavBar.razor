@@ -12,11 +12,79 @@
 </nav>
 </div>
 <div class="flex items-center gap-4">
-<div class="hidden md:flex relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-<input class="pl-10 pr-4 py-2 rounded-full border border-outline-variant bg-surface-container-low focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-body-md text-body-md text-on-surface w-64" placeholder="Search campaigns..." type="text"/>
-</div>
-<button class="bg-tertiary-container hover:bg-tertiary text-on-tertiary px-6 py-2 rounded-full font-label-md text-label-md scale-95 active:scale-90 transition-transform shadow-level-1">Donate</button>
+    @if (!isLoggedIn)
+    {
+        <a href="/login">
+            <button class="bg-primary-container hover:bg-primary text-on-tertiary px-6 py-2 rounded-full font-label-md text-label-md scale-95 active:scale-90 transition-transform shadow-level-1">Sign In</button>
+        </a>
+    }
+    else if (userRole == "Admin")
+    {
+        <a href="/admin">
+            <button class="bg-primary-container hover:bg-primary text-on-tertiary px-6 py-2 rounded-full font-label-md text-label-md scale-95 active:scale-90 transition-transform shadow-level-1">Dashboard</button>
+        </a>
+    }
+    else if (userRole == "penyelenggara")
+    {
+        <a href="/penyelenggara/dashboard">
+            <button class="bg-primary-container hover:bg-primary text-on-tertiary px-6 py-2 rounded-full font-label-md text-label-md scale-95 active:scale-90 transition-transform shadow-level-1">Dashboard</button>
+        </a>
+    }
 </div>
 </div>
 </header>
+
+@code {
+    private bool isLoggedIn = false;
+    private string userRole = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "authToken");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    isLoggedIn = true;
+                    userRole = GetRoleFromToken(token);
+                    StateHasChanged();
+                }
+            }
+            catch
+            {
+                // JSRuntime might not be available during pre-rendering
+            }
+        }
+    }
+
+    private string GetRoleFromToken(string token)
+    {
+        try
+        {
+            var parts = token.Split('.');
+            if (parts.Length < 2) return "";
+            var payload = parts[1].Replace('-', '+').Replace('_', '/');
+            switch (payload.Length % 4)
+            {
+                case 2: payload += "=="; break;
+                case 3: payload += "="; break;
+            }
+            var jsonBytes = Convert.FromBase64String(payload);
+            var json = System.Text.Encoding.UTF8.GetString(jsonBytes);
+            var jsonDoc = System.Text.Json.JsonDocument.Parse(json);
+            
+            if (jsonDoc.RootElement.TryGetProperty("role", out var roleProp))
+            {
+                return roleProp.GetString() ?? "";
+            }
+            if (jsonDoc.RootElement.TryGetProperty("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", out var rolePropLong))
+            {
+                return rolePropLong.GetString() ?? "";
+            }
+        }
+        catch {}
+        return "";
+    }
+}
