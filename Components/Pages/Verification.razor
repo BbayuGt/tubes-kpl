@@ -1,56 +1,153 @@
 ﻿@page "/verification"
 
+@using Microsoft.AspNetCore.WebUtilities
+@using System.Globalization
+
 @inject NavigationManager Nav
 
 <div class="container mt-5">
-
     <div class="row justify-content-center">
-
         <div class="col-md-6">
-
             <div class="card shadow">
-
                 <div class="card-body text-center">
+                    <h3>Verifying Your Donation</h3>
 
-                    <div class="spinner-border text-primary mb-3"
-                         role="status">
-                    </div>
-
-                    <h3>
-                        Verifying Your Donation
-                    </h3>
-
-                    <p>
-                        Please wait while we verify your payment.
+                    <p class="mb-2">
+                        Total transaksi: <strong>Rp @PaymentAmount.ToString("N0")</strong>
                     </p>
 
-                    <div class="alert alert-warning mt-3">
-
-                        Payment verification in progress...
-
+                    <div class="@StatusAlertClass mt-3">
+                        Status transaksi: <strong>@TransactionStatusLabel</strong>
                     </div>
 
-                    <button class="btn btn-primary mt-3"
-                            @onclick="GoToSuccess">
+                    <p class="text-muted small mt-3 mb-0">
+                        @StatusDescription
+                    </p>
 
-                        Continue
+                    @if (IsPending)
+                    {
+                        <div class="d-grid gap-2 mt-4">
+                            <button class="btn btn-success"
+                                    @onclick="MarkAsPaid">
+                                Tandai Berhasil
+                            </button>
 
-                    </button>
+                            <button class="btn btn-outline-danger"
+                                    @onclick="MarkAsFailed">
+                                Tandai Gagal
+                            </button>
 
+                            <button class="btn btn-outline-secondary"
+                                    @onclick="MarkAsExpired">
+                                Tandai Kedaluwarsa
+                            </button>
+                        </div>
+                    }
+                    else if (IsPaid)
+                    {
+                        <button class="btn btn-primary mt-4"
+                                @onclick="GoToSuccess">
+                            Continue
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline-primary mt-4"
+                                @onclick="BackToPayment">
+                            Back to Payment
+                        </button>
+                    }
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 @code {
+    private const string PendingStatus = "PENDING";
+    private const string PaidStatus = "PAID";
+    private const string FailedStatus = "FAILED";
+    private const string ExpiredStatus = "EXPIRED";
+    private decimal PaymentAmount = 100000;
+    private string TransactionStatus = PendingStatus;
 
-private void GoToSuccess()
+    protected override void OnInitialized()
     {
-        Nav.NavigateTo("/success");
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (decimal.TryParse(
+            query["amount"],
+            NumberStyles.Number,
+            CultureInfo.InvariantCulture,
+            out var amount) && amount > 0)
+        {
+            PaymentAmount = amount;
+        }
+
+        var status = query["status"].ToString();
+        if (IsKnownStatus(status))
+        {
+            TransactionStatus = status.ToUpperInvariant();
+        }
+    }
+
+    private bool IsPending => TransactionStatus == PendingStatus;
+    private bool IsPaid => TransactionStatus == PaidStatus;
+
+    private string TransactionStatusLabel => TransactionStatus switch
+    {
+        PaidStatus => "Berhasil",
+        FailedStatus => "Gagal",
+        ExpiredStatus => "Kedaluwarsa",
+        _ => "Pending"
+    };
+
+    private string StatusAlertClass => TransactionStatus switch
+    {
+        PaidStatus => "alert alert-success",
+        FailedStatus => "alert alert-danger",
+        ExpiredStatus => "alert alert-secondary",
+        _ => "alert alert-warning"
+    };
+
+    private string StatusDescription => TransactionStatus switch
+    {
+        PaidStatus => "Pembayaran sudah diterima dan transaksi siap diselesaikan.",
+        FailedStatus => "Pembayaran tidak berhasil diproses. Silakan ulangi pembayaran.",
+        ExpiredStatus => "Waktu pembayaran habis. Buat transaksi baru untuk melanjutkan.",
+        _ => "Pembayaran masih menunggu konfirmasi."
+    };
+
+    private static bool IsKnownStatus(string? status) =>
+        status is not null &&
+        (status.Equals(PendingStatus, StringComparison.OrdinalIgnoreCase) ||
+         status.Equals(PaidStatus, StringComparison.OrdinalIgnoreCase) ||
+         status.Equals(FailedStatus, StringComparison.OrdinalIgnoreCase) ||
+         status.Equals(ExpiredStatus, StringComparison.OrdinalIgnoreCase));
+
+    private void MarkAsPaid()
+    {
+        TransactionStatus = PaidStatus;
+    }
+
+    private void MarkAsFailed()
+    {
+        TransactionStatus = FailedStatus;
+    }
+
+    private void MarkAsExpired()
+    {
+        TransactionStatus = ExpiredStatus;
+    }
+
+    private void GoToSuccess()
+    {
+        Nav.NavigateTo($"/success?amount={Uri.EscapeDataString(PaymentAmount.ToString(CultureInfo.InvariantCulture))}&status={PaidStatus}");
+    }
+
+    private void BackToPayment()
+    {
+        Nav.NavigateTo($"/payment?amount={Uri.EscapeDataString(PaymentAmount.ToString(CultureInfo.InvariantCulture))}");
     }
 }

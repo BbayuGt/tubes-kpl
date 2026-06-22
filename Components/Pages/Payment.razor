@@ -1,7 +1,9 @@
-@page "/payment"
+﻿@page "/payment"
+
+@using Microsoft.AspNetCore.WebUtilities
+@using System.Globalization
 
 @inject NavigationManager Nav
-@inject IJSRuntime JS
 
 <div class="container mt-5">
 
@@ -30,9 +32,13 @@
                         <strong>Total Payment</strong>
 
                         <h3 class="mt-2">
-                            Rp @DonationAmount.ToString("N0")
+                            Rp @PaymentAmount.ToString("N0")
                         </h3>
 
+                    </div>
+
+                    <div class="alert alert-secondary small">
+                        Status transaksi awal: <strong>Pending</strong>
                     </div>
 
                     <button class="btn btn-success w-100"
@@ -53,24 +59,25 @@
 </div>
 
 @code {
+    private decimal PaymentAmount = 100000;
 
-    private decimal DonationAmount = 0;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnInitialized()
     {
-        if (firstRender)
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (decimal.TryParse(
+            query["amount"],
+            NumberStyles.Number,
+            CultureInfo.InvariantCulture,
+            out var amount) && amount > 0)
         {
-            var amountStr = await JS.InvokeAsync<string>("localStorage.getItem", "donationAmount");
-            if (decimal.TryParse(amountStr, out var amount))
-            {
-                DonationAmount = amount;
-                StateHasChanged();
-            }
+            PaymentAmount = amount;
         }
     }
 
     private void GoToVerification()
     {
-        Nav.NavigateTo("/verification");
+        Nav.NavigateTo($"/verification?amount={Uri.EscapeDataString(PaymentAmount.ToString(CultureInfo.InvariantCulture))}&status=PENDING");
     }
 }
