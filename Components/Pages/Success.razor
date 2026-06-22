@@ -1,9 +1,7 @@
-﻿@page "/success"
-
-@using Microsoft.AspNetCore.WebUtilities
-@using System.Globalization
+@page "/success"
 
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <div class="row justify-content-center">
 
@@ -28,7 +26,7 @@
                 </p>
 
                 <p>
-                    Clean Water for Sahel
+                    @(CampaignTitle ?? "Loading...")
                 </p>
 
                 <p>
@@ -36,15 +34,7 @@
                 </p>
 
                 <p>
-                    Rp @PaymentAmount.ToString("N0")
-                </p>
-
-                <p>
-                    <strong>Status</strong>
-                </p>
-
-                <p class="text-success">
-                    @TransactionStatusLabel
+                    Rp @DonationAmount.ToString("N0")
                 </p>
 
                 <button class="btn btn-primary mt-3"
@@ -63,37 +53,29 @@
 </div>
 
 @code {
-    private const string PaidStatus = "PAID";
-    private decimal PaymentAmount = 100000;
-    private string TransactionStatus = PaidStatus;
 
-    protected override void OnInitialized()
+    private decimal DonationAmount = 0;
+    private string? CampaignTitle;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var uri = Nav.ToAbsoluteUri(Nav.Uri);
-        var query = QueryHelpers.ParseQuery(uri.Query);
-
-        if (decimal.TryParse(
-            query["amount"],
-            NumberStyles.Number,
-            CultureInfo.InvariantCulture,
-            out var amount) && amount > 0)
+        if (firstRender)
         {
-            PaymentAmount = amount;
-        }
+            var amountStr = await JS.InvokeAsync<string>("localStorage.getItem", "donationAmount");
+            if (decimal.TryParse(amountStr, out var amount))
+            {
+                DonationAmount = amount;
+            }
 
-        var status = query["status"].ToString();
-        if (!string.IsNullOrWhiteSpace(status))
-        {
-            TransactionStatus = status.ToUpperInvariant();
+            CampaignTitle = await JS.InvokeAsync<string>("localStorage.getItem", "donationCampaign");
+
+            StateHasChanged();
         }
     }
 
-    private string TransactionStatusLabel =>
-        TransactionStatus == PaidStatus ? "Berhasil" : TransactionStatus;
-
     private void BackToDonation()
     {
-        Nav.NavigateTo("/donation");
+        Nav.NavigateTo("/");
     }
 
 }
