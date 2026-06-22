@@ -37,8 +37,11 @@ public class DonationModel
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
-    [JsonPropertyName("userId")]
-    public int UserId { get; set; }
+    [JsonPropertyName("donorName")]
+    public string? DonorName { get; set; }
+
+    [JsonPropertyName("donorEmail")]
+    public string? DonorEmail { get; set; }
 
     [JsonPropertyName("campaignId")]
     public int CampaignId { get; set; }
@@ -52,8 +55,8 @@ public class DonationModel
     [JsonPropertyName("status")]
     public string Status { get; set; } = "Pending";
 
-    [JsonPropertyName("user")]
-    public UserModel? User { get; set; }
+    [JsonPropertyName("externalId")]
+    public string? ExternalId { get; set; }
 
     [JsonPropertyName("campaign")]
     public CampaignModel? Campaign { get; set; }
@@ -338,6 +341,64 @@ public class AdminApiService
         catch
         {
             return null;
+        }
+    }
+
+    public async Task<List<PaymentStatusModel>> GetAllPaymentsAsync()
+    {
+        try
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<PaymentStatusModel>>("api/payment");
+            return result ?? new List<PaymentStatusModel>();
+        }
+        catch
+        {
+            return new List<PaymentStatusModel>();
+        }
+    }
+
+    // @todo: This is just for testing, webhook should be triggered by Xendit
+    public async Task<bool> TriggerWebhookAsync(string externalId, string status)
+    {
+        try
+        {
+            var payload = new { external_id = externalId, status = status };
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/webhook/xendit");
+            request.Headers.Add("x-callback-token", "webhook_xendit_donasi");
+            request.Content = JsonContent.Create(payload);
+            
+            var response = await _httpClient.SendAsync(request);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<List<UserModel>> GetAllUsersAsync()
+    {
+        try
+        {
+            var result = await _httpClient.GetFromJsonAsync<List<UserModel>>("api/user");
+            return result ?? new List<UserModel>();
+        }
+        catch
+        {
+            return new List<UserModel>();
+        }
+    }
+
+    public async Task<bool> UpdateUserRoleAsync(int id, string role)
+    {
+        try
+        {
+            var response = await _httpClient.PutAsJsonAsync($"api/user/{id}/role", new { role = role });
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
         }
     }
 }
