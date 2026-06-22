@@ -2,6 +2,8 @@
 @rendermode InteractiveServer
 @using tubes_kpl.Services
 @inject AdminApiService ApiService
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
 
 <HeadContent>
     <meta charset="utf-8"/>
@@ -101,8 +103,14 @@
             <div class="flex items-center gap-3">
                 <button class="relative p-2 rounded-lg hover:bg-surface-container transition-colors" title="Notifications">
                     <span class="material-symbols-outlined text-on-surface-variant text-[22px]" style="font-variation-settings: 'FILL' 0;">notifications</span>
+                @if (pendingCount > 0)
+                {
                     <span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
-                </button>
+                }
+            </button>
+            <button @onclick="ConfirmLogout" class="relative p-2 rounded-lg hover:bg-red-50 text-error transition-colors" title="Logout">
+                <span class="material-symbols-outlined text-[22px]">logout</span>
+            </button>
                 <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center">
                     <span class="text-label-sm font-label-sm text-on-primary">AD</span>
                 </div>
@@ -558,6 +566,15 @@
     {
         activeFilter = filter;
         selectedCampaign = null;
+    }
+
+    private async Task ConfirmLogout()
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to logout?");
+        if (confirmed)
+        {
+            NavigationManager.NavigateTo("/logout", true);
+        }
     }
 
     private async Task ApproveCampaign()
