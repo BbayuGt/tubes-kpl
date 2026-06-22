@@ -97,7 +97,7 @@
                     <a href="/admin" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Overview</a>
                     <a href="/admin/campaigns" class="nav-link active text-label-md font-label-md text-primary px-3 py-3">Campaigns</a>
                     <a href="/admin/donations" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Donations</a>
-                    <a href="/admin/applicants" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Applicants</a>
+                    <a href="/admin/users" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Users</a>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -468,6 +468,7 @@
     private bool isLoading = true;
     private bool showSuccessMessage = false;
     private string successMessage = "";
+    private int pendingCount = 0;
 
     private async Task SubmitRevision()
     {
@@ -509,14 +510,35 @@
         _ => allCampaigns
     };
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await JS.InvokeAsync<string>("localStorage.getItem", "authToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                NavigationManager.NavigateTo("/login", true);
+                return;
+            }
+            
+            ApiService.JwtToken = token;
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadData()
     {
         try
         {
+            isLoading = true;
+            StateHasChanged();
+            
             var campaigns = await ApiService.GetAllCampaignsAsync();
             if (campaigns != null)
             {
                 allCampaigns = campaigns;
+                pendingCount = reviewingCampaigns.Count;
             }
         }
         catch (Exception ex)
@@ -557,9 +579,9 @@
         return $"{(int)(span.TotalDays / 365)}y ago";
     }
 
-    private void SelectCampaign(CampaignModel c)
+    private void SelectCampaign(CampaignModel campaign)
     {
-        selectedCampaign = c;
+        selectedCampaign = campaign;
     }
 
     private void SetFilter(string filter)
