@@ -1,0 +1,349 @@
+@page "/admin/users"
+@rendermode InteractiveServer
+@using tubes_kpl.Services
+@inject AdminApiService ApiService
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+
+<HeadContent>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <title>User Management - @Config["AppName"] Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#f6faff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#003f87",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#0056b3",
+                        "tertiary": "#004c17",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#83fc8e",
+                        "on-tertiary-fixed": "#002106",
+                        "outline-variant": "#c2c6d4",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "surface-container": "#e6eff8",
+                        "on-surface": "#141d23",
+                        "on-surface-variant": "#424752",
+                        "surface-container-high": "#e0e9f2"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .shadow-ambient-1 { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
+        .shadow-ambient-2 { box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08); }
+        .nav-link { position: relative; padding-bottom: 12px; }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #003f87;
+            border-radius: 1px 1px 0 0;
+        }
+    </style>
+</HeadContent>
+
+<div class="bg-background font-body-md text-on-surface min-h-screen flex flex-col">
+
+    @if (showSuccessMessage)
+    {
+        <div class="fixed top-6 right-6 z-50 bg-tertiary-fixed text-on-tertiary-fixed px-6 py-3 rounded-xl shadow-ambient-2 flex items-center gap-3">
+            <span class="material-symbols-outlined text-[20px]">check_circle</span>
+            <span class="font-medium">@successMessage</span>
+        </div>
+    }
+
+    <nav class="bg-surface-container-lowest border-b border-outline-variant/30 sticky top-0 z-50">
+        <div class="max-w-[1280px] mx-auto flex items-center justify-between px-6 py-3">
+            <div class="flex items-center gap-8">
+                <a href="/admin" class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-[28px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+                    <span class="text-xl font-bold text-primary">@Config["AppName"]</span>
+                </a>
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="/admin" class="nav-link text-sm font-medium text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Overview</a>
+                    <a href="/admin/campaigns" class="nav-link text-sm font-medium text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Campaigns</a>
+                    <a href="/admin/donations" class="nav-link text-sm font-medium text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Donations</a>
+                    <a href="/admin/users" class="nav-link active text-sm font-medium text-primary px-3 py-3 transition-colors">Users</a>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button @onclick="ConfirmLogout" class="relative p-2 rounded-lg hover:bg-red-50 text-error transition-colors" title="Logout">
+                    <span class="material-symbols-outlined text-[22px]">logout</span>
+                </button>
+                <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center">
+                    <span class="text-xs font-bold text-on-primary">AD</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-[1280px] mx-auto w-full px-6 py-8">
+        <div class="mb-8">
+            <div class="flex items-center gap-3 mb-2">
+                <span class="material-symbols-outlined text-primary" style="font-size:32px;">group</span>
+                <h1 class="text-3xl font-bold text-on-surface">User Management</h1>
+            </div>
+            <p class="text-on-surface-variant">Review and manage user roles</p>
+        </div>
+
+        <div class="flex items-center gap-2 mb-6 flex-wrap">
+            <button @onclick='() => SetFilter("all")'
+                    class="@(activeFilter == "all" ? "bg-primary text-on-primary shadow-ambient-1" : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container") px-4 py-2 rounded-full text-sm font-semibold transition-all">
+                All <span class="ml-1 opacity-80">(@allUsers.Count)</span>
+            </button>
+            <button @onclick='() => SetFilter("admin")'
+                    class="@(activeFilter == "admin" ? "bg-primary text-on-primary shadow-ambient-1" : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container") px-4 py-2 rounded-full text-sm font-semibold transition-all">
+                Admin <span class="ml-1 opacity-80">(@allUsers.Count(u => u.Role == "Admin"))</span>
+            </button>
+            <button @onclick='() => SetFilter("penyelenggara")'
+                    class="@(activeFilter == "penyelenggara" ? "bg-primary text-on-primary shadow-ambient-1" : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container") px-4 py-2 rounded-full text-sm font-semibold transition-all">
+                Penyelenggara <span class="ml-1 opacity-80">(@allUsers.Count(u => u.Role == "Penyelenggara"))</span>
+            </button>
+            <button @onclick='() => SetFilter("user")'
+                    class="@(activeFilter == "user" ? "bg-primary text-on-primary shadow-ambient-1" : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container") px-4 py-2 rounded-full text-sm font-semibold transition-all">
+                Users <span class="ml-1 opacity-80">(@allUsers.Count(u => u.Role == "User"))</span>
+            </button>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="flex items-center justify-center py-20">
+                <div class="flex flex-col items-center gap-4">
+                    <div class="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                    <p class="text-on-surface-variant">Loading users...</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="lg:col-span-2">
+                    <div class="max-h-[calc(100vh-300px)] overflow-y-auto pr-1 space-y-3 scrollbar-thin">
+                        @if (filteredUsers.Count == 0)
+                        {
+                            <div class="flex flex-col items-center justify-center py-16 text-center">
+                                <span class="material-symbols-outlined text-outline-variant mb-3" style="font-size:48px;">group_off</span>
+                                <p class="text-on-surface-variant">No users found in this category</p>
+                            </div>
+                        }
+                        else
+                        {
+                            @foreach (var user in filteredUsers)
+                            {
+                                var isSelected = selectedUser?.Id == user.Id;
+                                <div @onclick="() => SelectUser(user)"
+                                     class="@(isSelected ? "ring-2 ring-primary border-primary shadow-ambient-2" : "border-outline-variant/40 hover:border-outline-variant hover:shadow-ambient-1") rounded-xl border p-4 cursor-pointer transition-all duration-200 bg-surface-container-lowest">
+
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-container text-on-surface">
+                                            @user.Role
+                                        </span>
+                                        <span class="text-xs text-on-surface-variant">ID: @user.Id</span>
+                                    </div>
+
+                                    <h3 class="font-semibold text-on-surface mb-1 truncate">@user.Name</h3>
+                                    <p class="text-sm text-on-surface-variant truncate">@user.Email</p>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="lg:col-span-3">
+                    @if (selectedUser == null)
+                    {
+                        <div class="flex flex-col items-center justify-center h-full min-h-[400px] bg-surface-container-lowest rounded-xl border border-outline-variant/40">
+                            <span class="material-symbols-outlined text-outline-variant mb-4" style="font-size:64px;">person</span>
+                            <p class="text-lg text-on-surface-variant font-medium">Select a user to review</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/40 overflow-hidden shadow-ambient-1">
+                            <div class="bg-primary p-6 relative overflow-hidden">
+                                <div class="relative z-10">
+                                    <h2 class="text-2xl font-bold text-white mb-1">@selectedUser.Name</h2>
+                                    <p class="text-white/80">@selectedUser.Email</p>
+                                </div>
+                            </div>
+
+                            <div class="p-6 space-y-6">
+                                <div class="bg-surface-container rounded-xl p-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-xs text-on-surface-variant mb-1">User ID</p>
+                                            <p class="text-lg font-medium text-on-surface">@selectedUser.Id</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-on-surface-variant mb-1">Current Role</p>
+                                            <p class="text-lg font-medium text-on-surface">@selectedUser.Role</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if (selectedUser.Id == 1)
+                                {
+                                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="material-symbols-outlined text-blue-600">info</span>
+                                            <h3 class="text-sm text-blue-800 font-semibold">Super Administrator</h3>
+                                        </div>
+                                        <p class="text-sm text-blue-700">This user is the system super administrator. Role cannot be modified.</p>
+                                    </div>
+                                }
+                                else if (selectedUser.Role == "Admin")
+                                {
+                                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="material-symbols-outlined text-amber-600">admin_panel_settings</span>
+                                            <h3 class="text-sm text-amber-800 font-semibold">Administrator</h3>
+                                        </div>
+                                        <p class="text-sm text-amber-700">Administrator roles cannot be modified from this interface.</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="flex items-center gap-3 pt-2">
+                                        @if (selectedUser.Role == "User")
+                                        {
+                                            <button @onclick='() => ChangeRole("Penyelenggara")'
+                                                    class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-tertiary text-on-tertiary font-semibold hover:bg-tertiary/90 transition-all shadow-ambient-1">
+                                                <span class="material-symbols-outlined">upgrade</span>
+                                                Promote to Penyelenggara
+                                            </button>
+                                        }
+                                        else if (selectedUser.Role == "Penyelenggara")
+                                        {
+                                            <button @onclick='() => ChangeRole("User")'
+                                                    class="flex items-center gap-2 px-5 py-2.5 rounded-xl border-2 border-error text-error font-semibold hover:bg-red-50 transition-all shadow-ambient-1">
+                                                <span class="material-symbols-outlined">person</span>
+                                                Demote to User
+                                            </button>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </main>
+</div>
+
+@code {
+    private List<UserModel> allUsers = new();
+    private UserModel? selectedUser;
+    private string activeFilter = "all";
+    private bool isLoading = true;
+    private bool showSuccessMessage = false;
+    private string successMessage = "";
+
+    private List<UserModel> filteredUsers => activeFilter switch
+    {
+        "admin" => allUsers.Where(u => u.Role == "Admin").ToList(),
+        "penyelenggara" => allUsers.Where(u => u.Role == "Penyelenggara").ToList(),
+        "user" => allUsers.Where(u => u.Role == "User").ToList(),
+        _ => allUsers
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await JS.InvokeAsync<string>("localStorage.getItem", "authToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                NavigationManager.NavigateTo("/login", true);
+                return;
+            }
+            
+            ApiService.JwtToken = token;
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            isLoading = true;
+            StateHasChanged();
+            
+            var users = await ApiService.GetAllUsersAsync();
+            if (users != null)
+            {
+                allUsers = users;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading users: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void SelectUser(UserModel user)
+    {
+        selectedUser = user;
+    }
+
+    private void SetFilter(string filter)
+    {
+        activeFilter = filter;
+        selectedUser = null;
+    }
+
+    private async Task ConfirmLogout()
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to logout?");
+        if (confirmed)
+        {
+            NavigationManager.NavigateTo("/logout", true);
+        }
+    }
+
+    private async Task ChangeRole(string newRole)
+    {
+        if (selectedUser == null) return;
+        if (selectedUser.Id == 1) return; // Cannot modify super admin
+        if (selectedUser.Role == "Admin") return; // Cannot modify admin
+
+        var result = await ApiService.UpdateUserRoleAsync(selectedUser.Id, newRole);
+        if (result)
+        {
+            successMessage = $"Role changed to {newRole} for {selectedUser.Name}";
+            showSuccessMessage = true;
+            StateHasChanged();
+            
+            var users = await ApiService.GetAllUsersAsync();
+            if (users != null)
+            {
+                allUsers = users;
+            }
+            selectedUser = allUsers.FirstOrDefault(c => c.Id == selectedUser?.Id);
+            
+            await Task.Delay(3000);
+            showSuccessMessage = false;
+            StateHasChanged();
+        }
+    }
+}

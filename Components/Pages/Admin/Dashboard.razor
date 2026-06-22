@@ -2,6 +2,8 @@
 @rendermode InteractiveServer
 @using tubes_kpl.Services
 @inject AdminApiService ApiService
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
 
 <HeadContent>
     <meta charset="utf-8"/>
@@ -137,7 +139,7 @@
                 <a href="/admin" class="nav-link active text-label-md font-label-md text-primary px-3 py-3">Overview</a>
                 <a href="/admin/campaigns" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Campaigns</a>
                 <a href="/admin/donations" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Donations</a>
-                <a href="/admin/applicants" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Applicants</a>
+                <a href="/admin/users" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Users</a>
             </div>
         </div>
         
