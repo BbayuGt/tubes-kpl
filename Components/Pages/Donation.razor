@@ -1,41 +1,50 @@
-@page "/donation"
+@page "/donation/{campaignId:int}"
 
-@using System.Globalization
-@using System.Text.RegularExpressions
-
+@using tubes_kpl.Models
+@using tubes_kpl.Services
 @inject NavigationManager Nav
+@inject CampaignService CampaignService
+@inject IJSRuntime JS
 
 <div class="container mt-4">
+
     <div class="row">
+
+        <!-- Campaign Section -->
         <div class="col-md-8">
+
             <div class="card mb-4">
                 <div class="card-body">
-                    <h2>Clean Water for Sahel</h2>
+
+                    <h2>@(Campaign?.Title ?? "Loading...")</h2>
 
                     <p>
-                        Providing sustainable solar-powered wells to
-                        drought-affected communities.
+                        @(Campaign?.Description ?? "Loading...")
                     </p>
 
                     <div class="progress mb-2">
                         <div class="progress-bar"
                              role="progressbar"
-                             style="width:65%">
+                             style="width:@(Campaign != null && Campaign.TargetAmount > 0 ? (Campaign.CollectedAmount / Campaign.TargetAmount * 100) : 0)%">
                         </div>
                     </div>
 
                     <p>
-                        <strong>Rp 325.000.000</strong>
-                        / Rp 500.000.000
+                        <strong>Rp @(Campaign?.CollectedAmount.ToString("N0") ?? "0")</strong>
+                        / Rp @(Campaign?.TargetAmount.ToString("N0") ?? "0")
                     </p>
+
                 </div>
             </div>
 
+            <!-- Amount Selection -->
             <div class="card">
                 <div class="card-body">
+
                     <h4>Select Amount</h4>
 
                     <div class="row g-2 mt-2">
+
                         <div class="col-4">
                             <button class="btn btn-outline-primary w-100"
                                     @onclick="() => SetAmount(10000)">
@@ -77,66 +86,37 @@
                                 Rp 500.000
                             </button>
                         </div>
+
                     </div>
 
                     <div class="mt-3">
-                        <label class="form-label">Custom Amount</label>
+                        <label class="form-label">
+                            Custom Amount
+                        </label>
 
                         <input type="number"
-                               min="@MinimumDonationAmount"
                                class="form-control"
                                @bind="CustomAmount" />
                     </div>
 
-                    @if (CustomAmount > 0 && !IsAmountValid)
-                    {
-                        <div class="text-danger small mt-2">
-                            Minimal donasi adalah Rp @MinimumDonationAmount.ToString("N0").
-                        </div>
-                    }
-
-                    <div class="mt-3">
-                        <label class="form-label">Nama Donatur</label>
-                        <input class="form-control"
-                               placeholder="Masukkan nama"
-                               @bind="DonorName" />
-                    </div>
-
-                    <div class="mt-3">
-                        <label class="form-label">Email Donatur</label>
-                        <input type="email"
-                               class="form-control"
-                               placeholder="Masukkan email"
-                               @bind="DonorEmail" />
-                    </div>
-
-                    @if (!string.IsNullOrWhiteSpace(DonorEmail) && !IsValidEmail)
-                    {
-                        <div class="text-danger small mt-2">
-                            Format email donor harus memakai domain yang valid, seperti gmail.com, yahoo.com, atau ac.id.
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
-                    {
-                        <div class="alert alert-danger mt-3 mb-0">
-                            @ErrorMessage
-                        </div>
-                    }
                 </div>
             </div>
+
         </div>
 
+        <!-- Summary Section -->
         <div class="col-md-4">
+
             <div class="card">
                 <div class="card-body">
+
                     <h4>Donation Summary</h4>
 
                     <hr />
 
                     <p>
                         <strong>Campaign:</strong><br />
-                        Clean Water for Sahel
+                        @(Campaign?.Title ?? "Loading...")
                     </p>
 
                     <p>
@@ -156,62 +136,46 @@
                     </h3>
 
                     <button class="btn btn-primary w-100 mt-3"
-                            @onclick="Donate"
-                            disabled="@(!CanContinue)">
+                            @onclick="Donate">
                         Continue to QRIS Payment
                     </button>
 
-                    @if (!CanContinue)
-                    {
-                        <small class="text-muted d-block mt-2">
-                            Nama wajib diisi, email harus valid, dan nominal minimal Rp @MinimumDonationAmount.ToString("N0").
-                        </small>
-                    }
                 </div>
             </div>
+
         </div>
+
     </div>
+
 </div>
 
 @code {
-    private const decimal MinimumDonationAmount = 10000;
-    private static readonly HashSet<string> AllowedEmailDomains = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "gmail.com",
-        "yahoo.com",
-        "yahoo.co.id",
-        "outlook.com",
-        "hotmail.com",
-        "live.com",
-        "icloud.com",
-        "proton.me",
-        "protonmail.com"
-    };
+
+    [Parameter]
+    public int campaignId { get; set; }
+
+    public tubes_kpl.Models.Campaign? Campaign { get; set; }
+
     private decimal SelectedAmount = 100000;
+
     private decimal CustomAmount = 0;
-    private string DonorName = string.Empty;
-    private string DonorEmail = string.Empty;
-    private string ErrorMessage = string.Empty;
-    private static readonly Regex ValidEmailRegex = new(
-        @"^[^@\s]+@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,24}$",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     private decimal FinalAmount =>
         CustomAmount > 0
             ? CustomAmount
             : SelectedAmount;
 
-    private bool IsValidEmail =>
-        !string.IsNullOrWhiteSpace(DonorEmail) &&
-        ValidEmailRegex.IsMatch(DonorEmail.Trim()) &&
-        HasAllowedEmailDomain(DonorEmail.Trim());
-
-    private bool IsAmountValid => FinalAmount >= MinimumDonationAmount;
-
-    private bool CanContinue =>
-        IsAmountValid &&
-        !string.IsNullOrWhiteSpace(DonorName) &&
-        IsValidEmail;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Campaign = await CampaignService.GetCampaignById(campaignId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching data: {ex.Message}");
+        }
+    }
 
     private void SetAmount(decimal amount)
     {
@@ -219,33 +183,14 @@
         CustomAmount = 0;
     }
 
-    private static bool HasAllowedEmailDomain(string email)
+    private async Task Donate()
     {
-        var atIndex = email.LastIndexOf('@');
-        if (atIndex < 0 || atIndex == email.Length - 1)
+        if (Campaign != null)
         {
-            return false;
+            await JS.InvokeVoidAsync("localStorage.setItem", "donationAmount", FinalAmount.ToString());
+            await JS.InvokeVoidAsync("localStorage.setItem", "donationCampaign", Campaign.Title);
         }
-
-        var domain = email[(atIndex + 1)..];
-        return AllowedEmailDomains.Contains(domain) ||
-               domain.EndsWith(".ac.id", StringComparison.OrdinalIgnoreCase) ||
-               domain.EndsWith(".sch.id", StringComparison.OrdinalIgnoreCase);
+        Nav.NavigateTo("/payment");
     }
 
-    private void Donate()
-    {
-        if (!CanContinue)
-        {
-            ErrorMessage = !IsAmountValid
-                ? $"Minimal donasi adalah Rp {MinimumDonationAmount.ToString("N0")}."
-                : string.IsNullOrWhiteSpace(DonorName) || string.IsNullOrWhiteSpace(DonorEmail)
-                ? "Nama dan email wajib diisi."
-                : "Format email donor harus memakai domain yang valid, seperti gmail.com, yahoo.com, atau ac.id.";
-            return;
-        }
-
-        ErrorMessage = string.Empty;
-        Nav.NavigateTo($"/payment?amount={Uri.EscapeDataString(FinalAmount.ToString(CultureInfo.InvariantCulture))}");
-    }
 }
