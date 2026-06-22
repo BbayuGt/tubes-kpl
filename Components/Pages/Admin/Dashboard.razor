@@ -309,19 +309,20 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-outline-variant/15">
-                                    @if (donations.Any())
+                                    @{ var pendingList = donations.Where(d => d.Status.Equals("pending", StringComparison.OrdinalIgnoreCase)).Take(5).ToList(); }
+                                    @if (pendingList.Any())
                                     {
-                                        @foreach (var donation in donations.Take(5))
+                                        @foreach (var donation in pendingList)
                                         {
                                             <tr class="hover:bg-surface-container/30 transition-colors">
                                                 <td class="px-5 py-3.5">
                                                     <div class="flex items-center gap-3">
                                                         <div class="w-8 h-8 rounded-full bg-primary-fixed/50 flex items-center justify-center flex-shrink-0">
-                                                            <span class="text-label-sm font-label-sm text-primary">@GetInitials(donation.User?.Name ?? "U")</span>
+                                                            <span class="text-label-sm font-label-sm text-primary">@GetInitials(string.IsNullOrWhiteSpace(donation.DonorName) ? "U" : donation.DonorName)</span>
                                                         </div>
                                                         <div>
-                                                            <p class="text-label-md font-label-md text-on-surface">@(donation.User?.Name ?? "Anonymous")</p>
-                                                            <p class="text-label-sm text-on-surface-variant">REF-@donation.Id.ToString("D5")</p>
+                                                            <p class="text-label-md font-label-md text-on-surface">@(string.IsNullOrWhiteSpace(donation.DonorName) ? "Anonymous" : donation.DonorName)</p>
+                                                            <p class="text-label-sm text-on-surface-variant">REF-@(donation.ExternalId ?? donation.Id.ToString("D5"))</p>
                                                         </div>
                                                     </div>
                                                 </td>
