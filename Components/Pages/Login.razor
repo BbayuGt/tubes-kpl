@@ -248,7 +248,28 @@
                     var token = tokenProp.GetString();
                     if (!string.IsNullOrEmpty(token))
                     {
+                        var role = GetRoleFromToken(token);
+                        if (role == "User")
+                        {
+                            errorMessage = "Regular user does not need to log in to donate.";
+                            return;
+                        }
+
                         await JSRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", token);
+
+                        if (role == "Admin")
+                        {
+                            NavigationManager.NavigateTo("/admin", true);
+                        }
+                        else if (role == "penyelenggara")
+                        {
+                            NavigationManager.NavigateTo("/penyelenggara/dashboard", true);
+                        }
+                        else
+                        {
+                            NavigationManager.NavigateTo("/", true);
+                        }
+                        return;
                     }
                 }
                 NavigationManager.NavigateTo("/", true);
@@ -263,6 +284,35 @@
         {
             errorMessage = "An error occurred while trying to log in: " + ex.Message;
         }
+    }
+
+    private string GetRoleFromToken(string token)
+    {
+        try
+        {
+            var parts = token.Split('.');
+            if (parts.Length < 2) return "";
+            var payload = parts[1].Replace('-', '+').Replace('_', '/');
+            switch (payload.Length % 4)
+            {
+                case 2: payload += "=="; break;
+                case 3: payload += "="; break;
+            }
+            var jsonBytes = Convert.FromBase64String(payload);
+            var json = System.Text.Encoding.UTF8.GetString(jsonBytes);
+            var jsonDoc = System.Text.Json.JsonDocument.Parse(json);
+            
+            if (jsonDoc.RootElement.TryGetProperty("role", out var roleProp))
+            {
+                return roleProp.GetString() ?? "";
+            }
+            if (jsonDoc.RootElement.TryGetProperty("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", out var rolePropLong))
+            {
+                return rolePropLong.GetString() ?? "";
+            }
+        }
+        catch {}
+        return "";
     }
 }
 </div>
