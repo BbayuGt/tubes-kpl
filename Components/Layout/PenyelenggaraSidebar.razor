@@ -1,0 +1,46 @@
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Config
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<aside class="sticky top-0 h-screen w-64 flex-shrink-0 bg-surface-container-lowest border-r border-outline-variant flex flex-col p-4 gap-4 z-50">
+    <div class="flex flex-col gap-1 mb-4 px-4">
+        <h1 class="font-headline-md text-headline-md font-bold text-primary">@Config["AppName"]</h1>
+        <p class="font-label-md text-label-md text-on-surface-variant">Organizer Portal</p>
+    </div>
+    <nav class="flex-grow flex flex-col gap-1">
+        <a class="flex items-center gap-3 px-4 py-3 cursor-pointer @(ActivePage == "Dashboard" ? "text-primary bg-secondary-container font-bold" : "text-on-surface-variant hover:bg-surface-container-highest") transition-colors rounded-lg font-label-md text-label-md" href="/penyelenggara/dashboard">
+            <span class="material-symbols-outlined">dashboard</span>
+            Dashboard
+        </a>
+        <a class="flex items-center gap-3 px-4 py-3 cursor-pointer @(ActivePage == "Campaigns" ? "text-primary bg-secondary-container font-bold" : "text-on-surface-variant hover:bg-surface-container-highest") transition-colors rounded-lg font-label-md text-label-md" href="/penyelenggara/dashboard/create-campaign">
+            <span class="material-symbols-outlined">volunteer_activism</span>
+            Campaigns
+        </a>
+    </nav>
+    <div class="px-4 mb-4">
+        <a href="/penyelenggara/dashboard/create-campaign" class="w-full py-3 bg-primary text-on-primary rounded-lg font-bold font-label-md hover:shadow-lg transition-all active:scale-95 text-center block">
+            Start Campaign
+        </a>
+    </div>
+    <div class="border-t border-outline-variant pt-4 space-y-1">
+        <button @onclick="ConfirmLogout" class="w-full flex items-center gap-3 px-4 py-3 cursor-pointer text-on-surface-variant hover:text-error hover:bg-red-50 rounded-lg transition-all duration-200 text-left">
+            <span class="material-symbols-outlined" data-icon="logout">logout</span>
+            <span class="font-label-md text-label-md">Logout</span>
+        </button>
+    </div>
+</aside>
+
+@code {
+    [Parameter]
+    public string ActivePage { get; set; } = "Dashboard";
+
+    private async Task ConfirmLogout()
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to logout?");
+        if (confirmed)
+        {
+            NavigationManager.NavigateTo("/logout", true);
+        }
+    }
+}

@@ -2,12 +2,13 @@
 @inject IHttpClientFactory HttpClientFactory
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject IConfiguration Config
 @rendermode InteractiveServer
 
 <HeadContent>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>KindCapital Organizer Dashboard</title>
+    <title>@Config["AppName"] Organizer Dashboard</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
@@ -111,75 +112,20 @@
         .progress-bar-fill { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </HeadContent>
-<div class="bg-background text-on-surface min-h-screen">
-    <!-- Top Navigation Bar -->
-    <header class="w-full h-16 bg-surface-container-lowest border-b border-outline-variant flex items-center justify-between px-gutter sticky top-0 z-50">
-        <div class="flex items-center gap-4">
-            <span class="font-headline-md text-headline-md font-bold text-primary">KindCapital</span>
-            <div class="hidden md:flex items-center bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant ml-4">
-                <span class="material-symbols-outlined text-outline text-[20px]">search</span>
-                <input class="bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface-variant w-64" placeholder="Search campaigns..." type="text">
-            </div>
-        </div>
+<div class="bg-background text-on-surface min-h-screen flex">
+    <tubes_kpl.Components.Layout.PenyelenggaraSidebar ActivePage="Dashboard" />
+    
+    <div class="flex-1 flex flex-col min-w-0">
+        <!-- Top Navigation Bar -->
+        <header class="h-16 w-full sticky top-0 z-40 bg-surface border-b border-outline-variant flex justify-end items-center px-gutter">
         <div class="flex items-center gap-4">
             <a href="/penyelenggara/dashboard/create-campaign" class="hidden md:flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-lg font-bold font-label-md hover:shadow-lg transition-all active:scale-95"><span class="material-symbols-outlined text-[20px]">add_circle</span>Create New Campaign</a>
-            <button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
-                <span class="material-symbols-outlined">notifications</span>
-            </button>
-            <button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors">
-                <span class="material-symbols-outlined">help</span>
-            </button>
             <div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
                 <img class="w-full h-full object-cover" data-alt="A professional headshot of a friendly-looking humanitarian organization manager. The subject is a woman in her 40s with a warm smile, set against a blurred, bright office background with soft natural lighting. The image maintains the KindCapital color palette with subtle blue and clean white tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEnufoG6LIEUNKrGwoyUNhvSedt1x5J4GpWyq-2LhQQCXMXQH4Ir8h6nA-FmDISHSw2CqIUgnk42gcPgz1MjutyO1yOZGlECAIojhXZNmWhYbI_YvQiaI9S4nQzd4X0HsgDHwugzGyu5mlDV9tupnKL56NYXEQwg_eVbnPFGByomTL-9vACL86_WXXeupcsTN36rZAjb3RV3u_mQmD47OjBdEfH1xt5M-ByowHQccfTCWRWsJt3GisoKYZ9rVPLDetfS3QcrR8fxum">
             </div>
         </div>
-    </header>
-    <div class="flex min-h-[calc(100vh-64px)]">
-        <!-- Side Navigation Bar -->
-        <nav class="hidden md:flex flex-col w-64 bg-surface-container-lowest border-r border-outline-variant py-stack-md sticky top-16 h-[calc(100vh-64px)]">
-            <div class="px-4 mb-stack-md">
-                <h2 class="font-headline-md text-headline-md font-black text-primary">KindCapital</h2>
-                <p class="font-label-md text-label-md text-on-surface-variant">Humanitarian Portal</p>
-            </div>
-            <div class="flex-grow space-y-1 px-2">
-                <!-- Dashboard Active -->
-                <a class="flex items-center gap-3 px-4 py-3 cursor-pointer text-primary bg-secondary-container rounded-lg font-bold transition-all duration-200" href="#">
-                    <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-                    <span class="font-label-md text-label-md">Dashboard</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 cursor-pointer text-on-surface-variant hover:text-primary hover:bg-surface-container-low rounded-lg transition-all duration-200" href="#">
-                    <span class="material-symbols-outlined" data-icon="campaign">campaign</span>
-                    <span class="font-label-md text-label-md">Campaigns</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 cursor-pointer text-on-surface-variant hover:text-primary hover:bg-surface-container-low rounded-lg transition-all duration-200" href="#">
-                    <span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
-                    <span class="font-label-md text-label-md">Donations</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 cursor-pointer text-on-surface-variant hover:text-primary hover:bg-surface-container-low rounded-lg transition-all duration-200" href="#">
-                    <span class="material-symbols-outlined" data-icon="assessment">assessment</span>
-                    <span class="font-label-md text-label-md">Reports</span>
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 cursor-pointer text-on-surface-variant hover:text-primary hover:bg-surface-container-low rounded-lg transition-all duration-200" href="#">
-                    <span class="material-symbols-outlined" data-icon="settings">settings</span>
-                    <span class="font-label-md text-label-md">Settings</span>
-                </a>
-            </div>
-            <div class="px-4 mb-stack-md">
-                <a href="/penyelenggara/dashboard/create-campaign" class="w-full py-3 bg-primary text-on-primary rounded-lg font-bold font-label-md hover:shadow-lg transition-all active:scale-95 text-center block">
-                    Start Campaign
-                </a>
-            </div>
-            <div class="border-t border-outline-variant pt-stack-sm space-y-1 px-2">
-                <a class="flex items-center gap-3 px-4 py-3 cursor-pointer text-on-surface-variant hover:text-primary hover:bg-surface-container-low rounded-lg transition-all duration-200" href="#">
-                    <span class="material-symbols-outlined" data-icon="contact_support">contact_support</span>
-                    <span class="font-label-md text-label-md">Support</span>
-                </a>
-                <button @onclick="ConfirmLogout" class="w-full flex items-center gap-3 px-4 py-3 cursor-pointer text-on-surface-variant hover:text-error hover:bg-red-50 rounded-lg transition-all duration-200 text-left">
-                    <span class="material-symbols-outlined" data-icon="logout">logout</span>
-                    <span class="font-label-md text-label-md">Logout</span>
-                </button>
-            </div>
-        </nav>
+        </header>
+        
         <!-- Main Content Area -->
         <main class="flex-grow p-gutter md:p-stack-lg max-w-7xl mx-auto w-full">
             <section class="mb-stack-lg">
@@ -258,6 +204,7 @@
             </div>
         </main>
     </div>
+
     <!-- Floating Action Button for Mobile -->
     <a href="/penyelenggara/dashboard/create-campaign" class="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-xl flex items-center justify-center active:scale-95 transition-transform">
         <span class="material-symbols-outlined text-[28px]">add</span>
