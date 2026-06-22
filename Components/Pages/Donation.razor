@@ -189,6 +189,7 @@
         {
             await JS.InvokeVoidAsync("localStorage.setItem", "donationAmount", FinalAmount.ToString());
             await JS.InvokeVoidAsync("localStorage.setItem", "donationCampaign", Campaign.Title);
+            await JS.InvokeVoidAsync("localStorage.setItem", "donationCampaignId", Campaign.Id.ToString());
         }
         Nav.NavigateTo("/payment");
     }

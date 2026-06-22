@@ -13,6 +13,10 @@ builder.Services.AddHttpClient("BackendAPI", client =>
 {
     client.BaseAddress = new Uri(backendUrl);
 });
+builder.Services.AddHttpClient<tubes_kpl.Services.DonationPaymentApi>(client =>
+{
+    client.BaseAddress = new Uri(backendUrl);
+});
 
 // Register Services
 builder.Services.AddScoped<CampaignService>();

@@ -2,6 +2,7 @@
 
 @inject NavigationManager Nav
 @inject IJSRuntime JS
+@inject tubes_kpl.Services.DonationPaymentApi PaymentApi
 
 <div class="container mt-5">
 
@@ -14,16 +15,8 @@
                 <div class="card-body text-center">
 
                     <h2 class="mb-4">
-                        Complete Your Payment
+                        Proceed to Payment
                     </h2>
-
-                    <p>
-                        Scan QRIS berikut menggunakan Mobile Banking atau E-Wallet.
-                    </p>
-
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HumanityFlowDonation"
-                         class="img-fluid mb-4"
-                         alt="QRIS Code" />
 
                     <div class="alert alert-info">
 
@@ -35,10 +28,25 @@
 
                     </div>
 
-                    <button class="btn btn-success w-100"
-                            @onclick="GoToVerification">
+                    <div class="mb-3 text-start">
+                        <label class="form-label">Nama</label>
+                        <input type="text" class="form-control" @bind="DonorName" placeholder="Masukkan nama" />
+                    </div>
 
-                        I Have Completed Payment
+                    <div class="mb-3 text-start">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" @bind="DonorEmail" placeholder="Masukkan email" />
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(ErrorMessage))
+                    {
+                        <div class="alert alert-danger">@ErrorMessage</div>
+                    }
+
+                    <button class="btn btn-success w-100"
+                            @onclick="GoToPayment">
+
+                        Pay via Xendit
 
                     </button>
 
@@ -55,22 +63,97 @@
 @code {
 
     private decimal DonationAmount = 0;
+    private int CampaignId = 0;
+    private string DonorName = string.Empty;
+    private string DonorEmail = string.Empty;
+    private string ErrorMessage = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            var extId = await JS.InvokeAsync<string>("localStorage.getItem", "lastExternalId");
+            if (!string.IsNullOrEmpty(extId))
+            {
+                try
+                {
+                    var statusRes = await PaymentApi.GetPaymentStatusAsync(extId);
+                    if (statusRes != null)
+                    {
+                        if (statusRes.Status == "SUCCEEDED" || statusRes.Status == "PAID")
+                        {
+                            await ClearCache();
+                            Nav.NavigateTo("/success");
+                            return;
+                        }
+                        else if (statusRes.Status == "PENDING")
+                        {
+                            // continue
+                        }
+                        else
+                        {
+                            await ClearCache();
+                            Nav.NavigateTo("/payment-error");
+                            return;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // ignore if not found or network error
+                }
+            }
+
             var amountStr = await JS.InvokeAsync<string>("localStorage.getItem", "donationAmount");
             if (decimal.TryParse(amountStr, out var amount))
             {
                 DonationAmount = amount;
-                StateHasChanged();
             }
+
+            var cIdStr = await JS.InvokeAsync<string>("localStorage.getItem", "donationCampaignId");
+            if (int.TryParse(cIdStr, out var cid))
+            {
+                CampaignId = cid;
+            }
+            StateHasChanged();
         }
     }
 
-    private void GoToVerification()
+    private async Task ClearCache()
     {
-        Nav.NavigateTo("/verification");
+        await JS.InvokeVoidAsync("localStorage.removeItem", "lastExternalId");
+        await JS.InvokeVoidAsync("localStorage.removeItem", "donationAmount");
+        await JS.InvokeVoidAsync("localStorage.removeItem", "donationCampaignId");
+        await JS.InvokeVoidAsync("localStorage.removeItem", "donationCampaign");
+    }
+
+    private async Task GoToPayment()
+    {
+        if (string.IsNullOrWhiteSpace(DonorName) || string.IsNullOrWhiteSpace(DonorEmail))
+        {
+            ErrorMessage = "Nama dan email wajib diisi.";
+            return;
+        }
+
+        try
+        {
+            var extId = $"INV-{CampaignId}-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+            var invoiceReq = new tubes_kpl.Services.CreateInvoiceRequestDto
+            {
+                ExternalId = extId,
+                Amount = DonationAmount,
+                PayerEmail = DonorEmail,
+                Description = $"Donation by {DonorName}"
+            };
+            
+            await JS.InvokeVoidAsync("localStorage.setItem", "lastExternalId", extId);
+            
+            var invoiceRes = await PaymentApi.CreateInvoiceAsync(invoiceReq);
+            Nav.NavigateTo(invoiceRes.InvoiceUrl);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Gagal memproses pembayaran: {ex.Message}";
+        }
     }
 }
