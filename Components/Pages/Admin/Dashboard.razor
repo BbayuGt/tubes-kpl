@@ -553,7 +553,24 @@
     private List<ActivityItem> recentActivities = new();
     private List<CategoryChip> activeCategories = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await JS.InvokeAsync<string>("localStorage.getItem", "authToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                NavigationManager.NavigateTo("/login", true);
+                return;
+            }
+            
+            ApiService.JwtToken = token;
+            await LoadData();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadData()
     {
         try
         {
