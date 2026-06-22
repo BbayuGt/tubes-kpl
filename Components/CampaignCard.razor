@@ -10,7 +10,7 @@
             <p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">@Campaign.Description</p>
             <div class="mt-auto">
                 <div class="flex justify-between items-end mb-2">
-                    <div class="font-label-sm text-label-sm text-on-surface-variant">Raised: <span class="text-on-surface font-semibold">$@Campaign.CollectedAmount</span> of $@Campaign.TargetAmount</div>
+                    <div class="font-label-sm text-label-sm text-on-surface-variant">Raised: <span class="text-on-surface font-semibold">Rp. @Campaign.CollectedAmount</span> of Rp. @Campaign.TargetAmount</div>
                     <div class="font-label-sm text-label-sm text-primary font-bold">@(Campaign.TargetAmount > 0 ? (int)(Campaign.CollectedAmount / Campaign.TargetAmount * 100) : 0)%</div>
                 </div>
                 <div class="h-2 bg-secondary-fixed rounded-full overflow-hidden mb-4">
