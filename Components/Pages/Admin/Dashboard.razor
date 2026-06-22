@@ -155,6 +155,9 @@
                     <span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
                 }
             </button>
+            <button @onclick="ConfirmLogout" class="relative p-2 rounded-lg hover:bg-red-50 text-error transition-colors" title="Logout">
+                <span class="material-symbols-outlined text-[22px]">logout</span>
+            </button>
             <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center">
                 <span class="text-label-sm font-label-sm text-on-primary">AD</span>
             </div>
@@ -704,5 +707,14 @@
         public string Bg { get; set; } = "";
         public string Text { get; set; } = "";
         public string Border { get; set; } = "";
+    }
+
+    private async Task ConfirmLogout()
+    {
+        var confirmed = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to logout?");
+        if (confirmed)
+        {
+            NavigationManager.NavigateTo("/logout", true);
+        }
     }
 }
