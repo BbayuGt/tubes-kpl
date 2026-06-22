@@ -1,0 +1,746 @@
+@page "/admin/donations"
+@rendermode InteractiveServer
+@using tubes_kpl.Services
+@inject AdminApiService ApiService
+
+<HeadContent>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <title>Verify Donations - HumanityFlow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#bbd0ff",
+                        "on-error-container": "#93000a",
+                        "on-background": "#141d23",
+                        "error-container": "#ffdad6",
+                        "background": "#f6faff",
+                        "on-secondary-fixed-variant": "#454748",
+                        "on-tertiary-fixed": "#002106",
+                        "inverse-surface": "#293138",
+                        "tertiary": "#004c17",
+                        "surface-bright": "#f6faff",
+                        "outline-variant": "#c2c6d4",
+                        "surface-variant": "#dbe4ed",
+                        "surface-dim": "#d2dbe4",
+                        "on-surface-variant": "#424752",
+                        "on-secondary-container": "#626566",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#6fe87c",
+                        "secondary-container": "#e1e3e4",
+                        "inverse-primary": "#acc7ff",
+                        "tertiary-container": "#006722",
+                        "surface-container-high": "#e0e9f2",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#5c5f60",
+                        "outline": "#727784",
+                        "secondary-fixed": "#e1e3e4",
+                        "surface-container-highest": "#dbe4ed",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001a40",
+                        "primary-container": "#0056b3",
+                        "surface-tint": "#115cb9",
+                        "on-primary": "#ffffff",
+                        "primary": "#003f87",
+                        "on-surface": "#141d23",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#83fc8e",
+                        "surface-container-low": "#ecf5fe",
+                        "surface-container": "#e6eff8",
+                        "surface": "#f6faff",
+                        "primary-fixed-dim": "#acc7ff",
+                        "primary-fixed": "#d7e2ff",
+                        "inverse-on-surface": "#e9f2fb",
+                        "tertiary-fixed-dim": "#66df75",
+                        "on-tertiary-fixed-variant": "#00531a",
+                        "on-secondary-fixed": "#191c1d",
+                        "secondary-fixed-dim": "#c5c7c8",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#004491"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "32px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "base": "8px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .shadow-ambient-1 { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
+        .shadow-ambient-2 { box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08); }
+        .nav-link { position: relative; padding-bottom: 12px; }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #003f87;
+            border-radius: 1px 1px 0 0;
+        }
+        .tab-btn { position: relative; padding-bottom: 8px; transition: color 0.2s ease; }
+        .tab-btn.active { color: #003f87; }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #003f87;
+            border-radius: 1px 1px 0 0;
+        }
+        .donation-row { transition: background-color 0.15s ease; cursor: pointer; }
+        .donation-row:hover { background-color: rgba(230, 239, 248, 0.5); }
+        .donation-row.selected { background-color: rgba(215, 226, 255, 0.35); border-left: 3px solid #003f87; }
+        .skeleton { background: linear-gradient(90deg, #e0e9f2 25%, #ecf5fe 50%, #e0e9f2 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .detail-panel { transition: opacity 0.2s ease, transform 0.2s ease; }
+        .toast-notification {
+            animation: slideInRight 0.3s ease forwards;
+        }
+        @@keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</HeadContent>
+<div class="bg-background min-h-screen flex flex-col font-body-md text-on-surface antialiased">
+
+<nav class="bg-surface-container-lowest border-b border-outline-variant/30 sticky top-0 z-50">
+    <div class="max-w-[1280px] mx-auto flex items-center justify-between px-6 py-3">
+        
+        <div class="flex items-center gap-8">
+            <a href="/admin" class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[28px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+                <span class="text-headline-md font-headline-md font-bold text-primary">HumanityFlow</span>
+            </a>
+            <div class="hidden md:flex items-center gap-1">
+                <a href="/admin" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Overview</a>
+                <a href="/admin/campaigns" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Campaigns</a>
+                <a href="/admin/donations" class="nav-link active text-label-md font-label-md text-primary px-3 py-3">Donations</a>
+                <a href="/admin/applicants" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Applicants</a>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <div class="hidden lg:flex items-center bg-surface-container rounded-lg px-3 py-2 gap-2 border border-outline-variant/30">
+                <span class="material-symbols-outlined text-on-surface-variant text-[20px]" style="font-variation-settings: 'FILL' 0;">search</span>
+                <input type="text" placeholder="Search donations..." @bind="searchQuery" @bind:event="oninput" @onkeyup="ApplyFilter" class="bg-transparent border-none outline-none text-body-md text-on-surface w-48 placeholder:text-on-surface-variant/60" />
+            </div>
+            <button class="relative p-2 rounded-lg hover:bg-surface-container transition-colors" title="Notifications">
+                <span class="material-symbols-outlined text-on-surface-variant text-[22px]" style="font-variation-settings: 'FILL' 0;">notifications</span>
+                @if (pendingCount > 0)
+                {
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+                }
+            </button>
+            <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center">
+                <span class="text-label-sm font-label-sm text-on-primary">AD</span>
+            </div>
+        </div>
+    </div>
+</nav>
+
+@if (showToast)
+{
+    <div class="fixed top-20 right-6 z-[100] toast-notification">
+        <div class="flex items-center gap-3 px-4 py-3 rounded-xl shadow-ambient-2 border @(toastType == "success" ? "bg-emerald-50 border-emerald-200" : "bg-red-50 border-red-200")">
+            <span class="material-symbols-outlined text-[20px] @(toastType == "success" ? "text-emerald-600" : "text-red-600")" style="font-variation-settings: 'FILL' 1;">
+                @(toastType == "success" ? "check_circle" : "error")
+            </span>
+            <p class="text-label-md font-label-md @(toastType == "success" ? "text-emerald-800" : "text-red-800")">@toastMessage</p>
+            <button @onclick="() => showToast = false" class="ml-2 p-0.5 rounded hover:bg-black/5 transition-colors">
+                <span class="material-symbols-outlined text-[16px] text-on-surface-variant">close</span>
+            </button>
+        </div>
+    </div>
+}
+
+<main class="flex-grow">
+    <div class="max-w-[1280px] mx-auto px-6 py-8">
+
+        @if (isLoading)
+        {
+            
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <div class="skeleton h-8 w-56 rounded-lg"></div>
+                    <div class="skeleton h-10 w-32 rounded-lg"></div>
+                </div>
+                <div class="flex gap-4">
+                    @for (int i = 0; i < 4; i++)
+                    {
+                        <div class="skeleton h-9 w-28 rounded-lg"></div>
+                    }
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-7 skeleton h-[500px] rounded-xl"></div>
+                    <div class="lg:col-span-5 skeleton h-[500px] rounded-xl"></div>
+                </div>
+            </div>
+        }
+        else
+        {
+            
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+                <div class="flex items-center gap-3">
+                    <h1 class="text-headline-lg font-headline-lg text-on-surface">Verification Queue</h1>
+                    @if (pendingCount > 0)
+                    {
+                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-label-md font-label-md">
+                            @pendingCount pending
+                        </span>
+                    }
+                </div>
+                <div class="flex items-center gap-3">
+                    <button class="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-outline-variant/50 text-label-md font-label-md text-on-surface-variant hover:bg-surface-container transition-colors">
+                        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 0;">filter_list</span>
+                        Filters
+                    </button>
+                    <button class="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-outline-variant/50 text-label-md font-label-md text-on-surface-variant hover:bg-surface-container transition-colors">
+                        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 0;">download</span>
+                        Export
+                    </button>
+                </div>
+            </div>
+
+            
+            <div class="flex items-center gap-1 border-b border-outline-variant/20 mb-6">
+                <button @onclick='() => SetFilter("all")' class="tab-btn @(activeFilter == "all" ? "active" : "") text-label-md font-label-md px-4 py-2.5 @(activeFilter == "all" ? "text-primary" : "text-on-surface-variant hover:text-on-surface") transition-colors">
+                    All Recent
+                    <span class="ml-1 text-label-sm opacity-70">(@allDonations.Count)</span>
+                </button>
+                <button @onclick='() => SetFilter("pending")' class="tab-btn @(activeFilter == "pending" ? "active" : "") text-label-md font-label-md px-4 py-2.5 @(activeFilter == "pending" ? "text-primary" : "text-on-surface-variant hover:text-on-surface") transition-colors">
+                    Pending Only
+                    <span class="ml-1 text-label-sm opacity-70">(@pendingCount)</span>
+                </button>
+                <button @onclick='() => SetFilter("verified")' class="tab-btn @(activeFilter == "verified" ? "active" : "") text-label-md font-label-md px-4 py-2.5 @(activeFilter == "verified" ? "text-primary" : "text-on-surface-variant hover:text-on-surface") transition-colors">
+                    Verified
+                    <span class="ml-1 text-label-sm opacity-70">(@verifiedCount)</span>
+                </button>
+                <button @onclick='() => SetFilter("rejected")' class="tab-btn @(activeFilter == "rejected" ? "active" : "") text-label-md font-label-md px-4 py-2.5 @(activeFilter == "rejected" ? "text-primary" : "text-on-surface-variant hover:text-on-surface") transition-colors">
+                    Rejected
+                    <span class="ml-1 text-label-sm opacity-70">(@rejectedCount)</span>
+                </button>
+            </div>
+
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                
+                <div class="lg:col-span-7">
+                    <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 border border-outline-variant/20 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="bg-surface-container/50">
+                                        <th class="text-left text-label-sm font-label-sm text-on-surface-variant px-5 py-3 uppercase tracking-wider">Donor</th>
+                                        <th class="text-right text-label-sm font-label-sm text-on-surface-variant px-5 py-3 uppercase tracking-wider">Amount</th>
+                                        <th class="text-left text-label-sm font-label-sm text-on-surface-variant px-5 py-3 uppercase tracking-wider">Date</th>
+                                        <th class="text-center text-label-sm font-label-sm text-on-surface-variant px-5 py-3 uppercase tracking-wider">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-outline-variant/15">
+                                    @if (filteredDonations.Any())
+                                    {
+                                        @foreach (var donation in filteredDonations)
+                                        {
+                                            var isSelected = selectedDonation?.Id == donation.Id;
+                                            var status = GetDonationStatus(donation.Id);
+                                            <tr class="donation-row @(isSelected ? "selected" : "")" @onclick="() => SelectDonation(donation)">
+                                                <td class="px-5 py-3.5">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-9 h-9 rounded-full bg-primary-fixed/50 flex items-center justify-center flex-shrink-0">
+                                                            <span class="text-label-sm font-label-sm text-primary">@GetInitials(donation.User?.Name ?? "U")</span>
+                                                        </div>
+                                                        <div>
+                                                            <p class="text-label-md font-label-md text-on-surface">@(donation.User?.Name ?? "Anonymous")</p>
+                                                            <p class="text-label-sm text-on-surface-variant">REF-@donation.Id.ToString("D5")</p>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-5 py-3.5 text-right">
+                                                    <p class="text-label-md font-label-md text-on-surface">@FormatCurrency(donation.Amount)</p>
+                                                </td>
+                                                <td class="px-5 py-3.5">
+                                                    <p class="text-body-md text-on-surface-variant">@donation.CreatedDate.ToString("dd MMM yyyy")</p>
+                                                    <p class="text-label-sm text-on-surface-variant/70">@donation.CreatedDate.ToString("HH:mm")</p>
+                                                </td>
+                                                <td class="px-5 py-3.5 text-center">
+                                                    @if (status == "verified")
+                                                    {
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-label-sm font-label-sm bg-emerald-100 text-emerald-700">
+                                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                                                            Verified
+                                                        </span>
+                                                    }
+                                                    else if (status == "rejected")
+                                                    {
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-label-sm font-label-sm bg-red-100 text-red-700">
+                                                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>
+                                                            Rejected
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-label-sm font-label-sm bg-amber-100 text-amber-700">
+                                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
+                                                            Pending
+                                                        </span>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="px-5 py-16 text-center">
+                                                <span class="material-symbols-outlined text-on-surface-variant/40 text-[48px] mb-3 block" style="font-variation-settings: 'FILL' 0;">inbox</span>
+                                                <p class="text-body-lg text-on-surface-variant font-medium mb-1">No donations found</p>
+                                                <p class="text-body-md text-on-surface-variant/70">Try adjusting your filters or check back later.</p>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        @if (filteredDonations.Any())
+                        {
+                            <div class="flex items-center justify-between px-5 py-3 bg-surface-container/30 border-t border-outline-variant/15">
+                                <p class="text-label-sm text-on-surface-variant">Showing @filteredDonations.Count of @allDonations.Count donations</p>
+                                <div class="flex items-center gap-1">
+                                    <button class="p-1.5 rounded hover:bg-surface-container transition-colors" disabled>
+                                        <span class="material-symbols-outlined text-on-surface-variant/50 text-[18px]">chevron_left</span>
+                                    </button>
+                                    <span class="px-3 py-1 rounded bg-primary text-on-primary text-label-sm font-label-sm">1</span>
+                                    <button class="p-1.5 rounded hover:bg-surface-container transition-colors">
+                                        <span class="material-symbols-outlined text-on-surface-variant text-[18px]">chevron_right</span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                
+                <div class="lg:col-span-5">
+                    @if (selectedDonation != null)
+                    {
+                        var selStatus = GetDonationStatus(selectedDonation.Id);
+                        <div class="detail-panel bg-surface-container-lowest rounded-xl shadow-ambient-1 border border-outline-variant/20 overflow-hidden">
+                            
+                            <div class="px-5 py-4 border-b border-outline-variant/15 bg-surface-container/30">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        @if (selStatus == "verified")
+                                        {
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-label-md font-label-md">
+                                                <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                                VERIFIED
+                                            </span>
+                                        }
+                                        else if (selStatus == "rejected")
+                                        {
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-label-md font-label-md">
+                                                <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">cancel</span>
+                                                REJECTED
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-label-md font-label-md">
+                                                <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 0;">hourglass_top</span>
+                                                PENDING VERIFICATION
+                                            </span>
+                                        }
+                                    </div>
+                                    <button @onclick="() => selectedDonation = null" class="p-1 rounded hover:bg-surface-container transition-colors">
+                                        <span class="material-symbols-outlined text-on-surface-variant text-[20px]">close</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="p-5 space-y-5">
+                                
+                                <div>
+                                    <h3 class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-3">Donor Information</h3>
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="w-12 h-12 rounded-full bg-primary-fixed/50 flex items-center justify-center">
+                                            <span class="text-label-md font-label-md text-primary font-bold">@GetInitials(selectedDonation.User?.Name ?? "U")</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-label-md font-label-md text-on-surface font-semibold">@(selectedDonation.User?.Name ?? "Anonymous Donor")</p>
+                                            <p class="text-label-sm text-on-surface-variant">@(selectedDonation.User?.Email ?? "No email provided")</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                
+                                <div>
+                                    <h3 class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Campaign</h3>
+                                    <div class="flex items-center gap-2 p-3 rounded-lg bg-surface-container/40 border border-outline-variant/15">
+                                        <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 0;">campaign</span>
+                                        <p class="text-label-md font-label-md text-on-surface">@(selectedDonation.Campaign?.Title ?? "General Fund")</p>
+                                    </div>
+                                </div>
+
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="p-3 rounded-lg bg-surface-container/40 border border-outline-variant/15">
+                                        <p class="text-label-sm font-label-sm text-on-surface-variant mb-1">Amount</p>
+                                        <p class="text-headline-md font-headline-md text-on-surface">@FormatCurrency(selectedDonation.Amount)</p>
+                                    </div>
+                                    <div class="p-3 rounded-lg bg-surface-container/40 border border-outline-variant/15">
+                                        <p class="text-label-sm font-label-sm text-on-surface-variant mb-1">Date</p>
+                                        <p class="text-label-md font-label-md text-on-surface">@selectedDonation.CreatedDate.ToString("dd MMM yyyy")</p>
+                                        <p class="text-label-sm text-on-surface-variant">@selectedDonation.CreatedDate.ToString("HH:mm:ss")</p>
+                                    </div>
+                                </div>
+
+                                
+                                <div>
+                                    <h3 class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Audit Details</h3>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between py-2 border-b border-outline-variant/10">
+                                            <span class="text-label-md text-on-surface-variant">Reference ID</span>
+                                            <span class="text-label-md font-label-md text-on-surface font-mono">REF-@selectedDonation.Id.ToString("D5")</span>
+                                        </div>
+                                        <div class="flex items-center justify-between py-2 border-b border-outline-variant/10">
+                                            <span class="text-label-md text-on-surface-variant">Donor ID</span>
+                                            <span class="text-label-md font-label-md text-on-surface font-mono">USR-@selectedDonation.UserId.ToString("D4")</span>
+                                        </div>
+                                        <div class="flex items-center justify-between py-2 border-b border-outline-variant/10">
+                                            <span class="text-label-md text-on-surface-variant">Campaign ID</span>
+                                            <span class="text-label-md font-label-md text-on-surface font-mono">CMP-@selectedDonation.CampaignId.ToString("D4")</span>
+                                        </div>
+                                        <div class="flex items-center justify-between py-2">
+                                            <span class="text-label-md text-on-surface-variant">Payment Method</span>
+                                            <span class="text-label-md font-label-md text-on-surface">Bank Transfer</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                
+                                <button @onclick="OpenProofModal" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-outline-variant/50 text-label-md font-label-md text-on-surface-variant hover:bg-surface-container transition-colors">
+                                    <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 0;">receipt_long</span>
+                                    View Payment Proof
+                                </button>
+
+                                
+                                @if (selStatus == "pending")
+                                {
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <button @onclick="() => RejectDonation(selectedDonation.Id)"
+                                                class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-red-50 text-red-700 text-label-md font-label-md font-semibold hover:bg-red-100 border border-red-200 transition-colors">
+                                            <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 0;">close</span>
+                                            Reject
+                                        </button>
+                                        <button @onclick="() => ApproveDonation(selectedDonation.Id)"
+                                                class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-tertiary text-on-tertiary text-label-md font-label-md font-semibold hover:bg-tertiary-container transition-colors shadow-sm">
+                                            <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 0;">check</span>
+                                            Approve
+                                        </button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-surface-container/40 border border-outline-variant/20">
+                                        <span class="material-symbols-outlined text-on-surface-variant text-[18px]" style="font-variation-settings: 'FILL' 0;">info</span>
+                                        <p class="text-label-md text-on-surface-variant">This donation has already been @selStatus.</p>
+                                    </div>
+                                }
+
+                                
+                                <div class="flex items-start gap-3 p-3 rounded-lg bg-primary-fixed/15 border border-primary-fixed/30">
+                                    <span class="material-symbols-outlined text-primary text-[20px] flex-shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 0;">lightbulb</span>
+                                    <div>
+                                        <p class="text-label-md font-label-md text-primary font-semibold mb-0.5">Verification Tip</p>
+                                        <p class="text-label-sm text-on-surface-variant">Cross-check the donor reference with the payment proof before approving. Ensure the amount matches the campaign records.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        
+                        <div class="bg-surface-container-lowest rounded-xl shadow-ambient-1 border border-outline-variant/20 p-8 flex flex-col items-center justify-center min-h-[400px]">
+                            <div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4">
+                                <span class="material-symbols-outlined text-on-surface-variant/50 text-[32px]" style="font-variation-settings: 'FILL' 0;">touch_app</span>
+                            </div>
+                            <h3 class="text-label-md font-label-md text-on-surface font-semibold mb-1">Select a Donation</h3>
+                            <p class="text-body-md text-on-surface-variant text-center max-w-[240px]">Click on any donation from the table to view details and take action.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</main>
+
+<footer class="border-t border-outline-variant/20 mt-auto">
+    <div class="max-w-[1280px] mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+            <span class="text-label-md font-label-md text-on-surface font-semibold">HumanityFlow</span>
+        </div>
+        <p class="text-label-sm font-label-sm text-on-surface-variant opacity-60">© 2026 HumanityFlow. All rights reserved.</p>
+        <div class="flex items-center gap-4">
+            <a href="#" class="text-label-sm text-on-surface-variant hover:text-primary transition-colors">Privacy</a>
+            <a href="#" class="text-label-sm text-on-surface-variant hover:text-primary transition-colors">Terms</a>
+            <a href="#" class="text-label-sm text-on-surface-variant hover:text-primary transition-colors">Support</a>
+            <a href="/admin" class="text-label-sm text-on-surface-variant hover:text-primary transition-colors">Dashboard</a>
+        </div>
+    </div>
+</footer>
+
+    
+    @if (showProofModal && selectedDonation != null)
+    {
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" @onclick="CloseProofModal">
+            <div class="bg-surface-container-lowest rounded-2xl shadow-ambient-2 w-full max-w-md mx-4 overflow-hidden border border-outline-variant/20" @onclick:stopPropagation="true">
+                <div class="bg-primary px-6 py-4 flex items-center justify-between text-on-primary">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined">receipt_long</span>
+                        <h3 class="text-headline-md font-bold">Payment Receipt Proof</h3>
+                    </div>
+                    <button @onclick="CloseProofModal" class="p-1 rounded hover:bg-primary-container text-on-primary transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="p-6 space-y-6">
+                    
+                    <div class="bg-white border-2 border-dashed border-outline-variant/40 rounded-xl p-5 shadow-sm text-on-surface relative">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-tertiary rounded-t-xl"></div>
+                        <div class="text-center pb-4 border-b border-outline-variant/20 mt-2">
+                            <h4 class="font-headline-md text-primary font-bold">HumanityFlow Transfer Proof</h4>
+                            <p class="text-label-sm text-on-surface-variant uppercase mt-1">Transaction ID: TXN-@selectedDonation.Id.ToString("D8")</p>
+                        </div>
+                        <div class="py-4 space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-label-md text-on-surface-variant">Donor Name</span>
+                                <span class="text-label-md font-semibold">@(selectedDonation.User?.Name ?? "Anonymous Donor")</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-label-md text-on-surface-variant">Payer Email</span>
+                                <span class="text-label-md font-mono text-sm max-w-[200px] truncate">@(selectedDonation.User?.Email ?? "N/A")</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-label-md text-on-surface-variant">Recipient Campaign</span>
+                                <span class="text-label-md text-right max-w-[200px] truncate">@(selectedDonation.Campaign?.Title ?? "General Fund")</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-label-md text-on-surface-variant">Bank Destination</span>
+                                <span class="text-label-md font-mono">BCA (HumanityFlow Account)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-label-md text-on-surface-variant">Status</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-label-sm font-semibold bg-emerald-100 text-emerald-800">
+                                    SUCCESS
+                                </span>
+                            </div>
+                        </div>
+                        <div class="pt-4 border-t border-outline-variant/20 flex flex-col items-center">
+                            <p class="text-label-sm text-on-surface-variant uppercase">Transfer Amount</p>
+                            <p class="text-display-lg text-primary font-bold mt-1">@FormatCurrency(selectedDonation.Amount)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-surface-container/30 px-6 py-4 flex justify-end border-t border-outline-variant/15">
+                    <button @onclick="CloseProofModal" class="px-5 py-2.5 rounded-xl bg-primary text-on-primary text-label-md font-semibold hover:bg-primary/95 transition-all shadow-sm">
+                        Close View
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    private List<DonationModel> allDonations = new();
+    private List<DonationModel> filteredDonations = new();
+    private DonationModel? selectedDonation = null;
+    private bool isLoading = true;
+    private string activeFilter = "all";
+    private bool showProofModal = false;
+
+    private void OpenProofModal() => showProofModal = true;
+    private void CloseProofModal() => showProofModal = false;
+
+    private bool showToast = false;
+    private string toastMessage = "";
+    private string toastType = "success";
+
+    private int pendingCount => allDonations.Count(d => GetDonationStatus(d.Id) == "pending");
+    private int verifiedCount => allDonations.Count(d => GetDonationStatus(d.Id) == "verified");
+    private int rejectedCount => allDonations.Count(d => GetDonationStatus(d.Id) == "rejected");
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            allDonations = await ApiService.GetAllDonationsAsync();
+            ApplyFilter();
+        }
+        catch
+        {
+            allDonations = new List<DonationModel>();
+            filteredDonations = new List<DonationModel>();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private string GetDonationStatus(int donationId)
+    {
+        var donation = allDonations.FirstOrDefault(d => d.Id == donationId);
+        return donation?.Status?.ToLower() ?? "pending";
+    }
+
+    private string searchQuery = "";
+
+    private void SetFilter(string filter)
+    {
+        activeFilter = filter;
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        var query = allDonations.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            query = query.Where(d => 
+                (d.User?.Name?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (d.User?.Email?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (d.Campaign?.Title?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                d.Id.ToString().Contains(searchQuery)
+            );
+        }
+
+        filteredDonations = activeFilter switch
+        {
+            "pending" => query.Where(d => GetDonationStatus(d.Id) == "pending").ToList(),
+            "verified" => query.Where(d => GetDonationStatus(d.Id) == "verified").ToList(),
+            "rejected" => query.Where(d => GetDonationStatus(d.Id) == "rejected").ToList(),
+            _ => query.ToList()
+        };
+    }
+
+    private void SelectDonation(DonationModel donation)
+    {
+        selectedDonation = donation;
+    }
+
+    private async Task ApproveDonation(int donationId)
+    {
+        var donation = allDonations.FirstOrDefault(d => d.Id == donationId);
+        if (donation != null)
+        {
+            var success = await ApiService.UpdateDonationStatusAsync(donationId, "verified");
+            if (success)
+            {
+                donation.Status = "verified";
+                ApplyFilter();
+                await ShowToast("Donation REF-" + donationId.ToString("D5") + " has been verified successfully.", "success");
+            }
+            else
+            {
+                await ShowToast("Failed to update status in backend.", "error");
+            }
+        }
+    }
+
+    private async Task RejectDonation(int donationId)
+    {
+        var donation = allDonations.FirstOrDefault(d => d.Id == donationId);
+        if (donation != null)
+        {
+            var success = await ApiService.UpdateDonationStatusAsync(donationId, "rejected");
+            if (success)
+            {
+                donation.Status = "rejected";
+                ApplyFilter();
+                await ShowToast("Donation REF-" + donationId.ToString("D5") + " has been rejected.", "error");
+            }
+            else
+            {
+                await ShowToast("Failed to update status in backend.", "error");
+            }
+        }
+    }
+
+    private async Task ShowToast(string message, string type)
+    {
+        toastMessage = message;
+        toastType = type;
+        showToast = true;
+        StateHasChanged();
+
+        await Task.Delay(4000);
+        showToast = false;
+        StateHasChanged();
+    }
+
+    private string FormatCurrency(decimal amount)
+    {
+        if (amount >= 1_000_000)
+            return $"Rp {amount / 1_000_000:N1}M";
+        if (amount >= 1_000)
+            return $"Rp {amount / 1_000:N0}K";
+        return $"Rp {amount:N0}";
+    }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "?";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        return parts[0][0].ToString().ToUpper();
+    }
+}

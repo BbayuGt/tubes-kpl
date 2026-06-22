@@ -3,9 +3,7 @@
 @rendermode InteractiveServer
 @inject IHttpClientFactory HttpClientFactory
 
-<!DOCTYPE html>
-
-<html lang="en"><head>
+<HeadContent>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>HumanityFlow - Homepage</title>
@@ -109,8 +107,8 @@
         .shadow-level-1 { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
         .shadow-level-2 { box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08); }
     </style>
-</head>
-<body class="antialiased flex flex-col min-h-screen">
+</HeadContent>
+<div class="antialiased flex flex-col min-h-screen">
 <TopNavBar />
 <main class="flex-grow">
 <HeroSection />
@@ -148,19 +146,19 @@ else
 </main>
 <AppFooter />
 @code {
-    private List<Campaign>? campaigns;
+    private List<Models.Campaign>? campaigns;
 
     protected override async Task OnInitializedAsync()
     {
         var client = HttpClientFactory.CreateClient("BackendAPI");
         try
         {
-            campaigns = await client.GetFromJsonAsync<List<Campaign>>("api/Campaign");
+            campaigns = await client.GetFromJsonAsync<List<Models.Campaign>>("api/Campaign");
         }
         catch
         {
-            campaigns = new List<Campaign>();
+            campaigns = new List<Models.Campaign>();
         }
     }
 }
-</body></html>
+</div>
