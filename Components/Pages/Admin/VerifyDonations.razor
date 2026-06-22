@@ -7,7 +7,7 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <title>Verify Donations - HumanityFlow</title>
+    <title>Verify Donations - @Config["AppName"]</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
@@ -150,7 +150,7 @@
         <div class="flex items-center gap-8">
             <a href="/admin" class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-primary text-[28px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
-                <span class="text-headline-md font-headline-md font-bold text-primary">HumanityFlow</span>
+                <span class="text-headline-md font-headline-md font-bold text-primary">@Config["AppName"]</span>
             </a>
             <div class="hidden md:flex items-center gap-1">
                 <a href="/admin" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Overview</a>
@@ -522,9 +522,9 @@
     <div class="max-w-[1280px] mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
-            <span class="text-label-md font-label-md text-on-surface font-semibold">HumanityFlow</span>
+            <span class="text-label-md font-label-md text-on-surface font-semibold">@Config["AppName"]</span>
         </div>
-        <p class="text-label-sm font-label-sm text-on-surface-variant opacity-60">© 2026 HumanityFlow. All rights reserved.</p>
+        <p class="text-label-sm font-label-sm text-on-surface-variant opacity-60">© 2026 @Config["AppName"]. All rights reserved.</p>
         <div class="flex items-center gap-4">
             <a href="#" class="text-label-sm text-on-surface-variant hover:text-primary transition-colors">Privacy</a>
             <a href="#" class="text-label-sm text-on-surface-variant hover:text-primary transition-colors">Terms</a>
@@ -553,7 +553,7 @@
                     <div class="bg-white border-2 border-dashed border-outline-variant/40 rounded-xl p-5 shadow-sm text-on-surface relative">
                         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-tertiary rounded-t-xl"></div>
                         <div class="text-center pb-4 border-b border-outline-variant/20 mt-2">
-                            <h4 class="font-headline-md text-primary font-bold">HumanityFlow Transfer Proof</h4>
+                            <h4 class="font-headline-md text-primary font-bold">@Config["AppName"] Transfer Proof</h4>
                             <p class="text-label-sm text-on-surface-variant uppercase mt-1">Transaction ID: TXN-@selectedDonation.Id.ToString("D8")</p>
                         </div>
                         <div class="py-4 space-y-3">
@@ -571,7 +571,7 @@
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-label-md text-on-surface-variant">Bank Destination</span>
-                                <span class="text-label-md font-mono">BCA (HumanityFlow Account)</span>
+                                <span class="text-label-md font-mono">BCA (@Config["AppName"] Account)</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-label-md text-on-surface-variant">Status</span>

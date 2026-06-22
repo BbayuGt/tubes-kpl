@@ -7,7 +7,7 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <title>Campaign Verification - HumanityFlow Admin</title>
+    <title>Campaign Verification - @Config["AppName"] Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
@@ -89,7 +89,7 @@
             <div class="flex items-center gap-8">
                 <a href="/admin" class="flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary text-[28px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
-                    <span class="text-headline-md font-headline-md font-bold text-primary">HumanityFlow</span>
+                    <span class="text-headline-md font-headline-md font-bold text-primary">@Config["AppName"]</span>
                 </a>
                 <div class="hidden md:flex items-center gap-1">
                     <a href="/admin" class="nav-link text-label-md font-label-md text-on-surface-variant hover:text-primary px-3 py-3 transition-colors">Overview</a>
@@ -407,7 +407,7 @@
     
     <footer class="border-t border-outline-variant/30 py-6 mt-auto">
         <div class="max-w-[1280px] mx-auto px-margin-desktop text-center">
-            <p class="text-label-md text-on-surface-variant">&copy; 2026 HumanityFlow. Admin Panel v2.1</p>
+            <p class="text-label-md text-on-surface-variant">&copy; 2026 @Config["AppName"]. Admin Panel v2.1</p>
         </div>
     </footer>
 
