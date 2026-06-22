@@ -174,10 +174,10 @@
                     <span class="material-symbols-outlined" data-icon="contact_support">contact_support</span>
                     <span class="font-label-md text-label-md">Support</span>
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 cursor-pointer text-on-surface-variant hover:text-primary hover:bg-surface-container-low rounded-lg transition-all duration-200" href="#">
+                <button @onclick="ConfirmLogout" class="w-full flex items-center gap-3 px-4 py-3 cursor-pointer text-on-surface-variant hover:text-error hover:bg-red-50 rounded-lg transition-all duration-200 text-left">
                     <span class="material-symbols-outlined" data-icon="logout">logout</span>
                     <span class="font-label-md text-label-md">Logout</span>
-                </a>
+                </button>
             </div>
         </nav>
         <!-- Main Content Area -->
@@ -326,16 +326,7 @@
             {
                 userName = authResponse.User.Name;
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error fetching user data: {ex.Message}");
-            NavigationManager.NavigateTo("/login");
-            return;
-        }
 
-        try
-        {
             campaigns = await client.GetFromJsonAsync<List<Campaign>>("/api/campaign");
         }
         catch (Exception ex)
@@ -367,5 +358,14 @@
         public string? ImageUrl { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
+    }
+
+    private async Task ConfirmLogout()
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to logout?");
+        if (confirmed)
+        {
+            NavigationManager.NavigateTo("/logout", true);
+        }
     }
 }
