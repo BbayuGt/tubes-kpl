@@ -557,17 +557,51 @@
     {
         try
         {
+            isLoading = true;
+            StateHasChanged();
+            
             var campaignsTask = ApiService.GetAllCampaignsAsync();
             var donationsTask = ApiService.GetAllDonationsAsync();
+            var paymentsTask = ApiService.GetAllPaymentsAsync();
 
-            await Task.WhenAll(campaignsTask, donationsTask);
+            await Task.WhenAll(campaignsTask, donationsTask, paymentsTask);
 
             campaigns = await campaignsTask;
-            donations = await donationsTask;
+            var realDonations = await donationsTask;
+            var payments = await paymentsTask;
+
+            donations = new List<DonationModel>();
+
+            foreach(var d in realDonations)
+            {
+                d.Status = "verified";
+                donations.Add(d);
+            }
+
+            foreach(var p in payments)
+            {
+                var statusStr = p.Status.ToUpper();
+                if (statusStr == "SUCCEEDED" || statusStr == "PAID") continue;
+
+                string mappedStatus = "pending";
+                if (statusStr == "FAILED" || statusStr == "EXPIRED") mappedStatus = "rejected";
+
+                donations.Add(new DonationModel
+                {
+                    Id = Math.Abs(p.ExternalId.GetHashCode()),
+                    ExternalId = p.ExternalId,
+                    Amount = p.Amount,
+                    CreatedDate = p.CreatedAt,
+                    Status = mappedStatus,
+                    DonorName = p.PayerEmail.Split('@').FirstOrDefault() ?? "Unknown",
+                    DonorEmail = p.PayerEmail,
+                    Campaign = new CampaignModel { Title = p.Description }
+                });
+            }
 
             totalDonations = donations.Where(d => d.Status.Equals("verified", StringComparison.OrdinalIgnoreCase)).Sum(d => d.Amount);
             activeCampaigns = campaigns.Count(c => c.IsActive);
-            pendingVerifications = donations.Count(d => d.Status.Equals("Pending", StringComparison.OrdinalIgnoreCase));
+            pendingVerifications = donations.Count(d => d.Status.Equals("pending", StringComparison.OrdinalIgnoreCase));
 
             GenerateChartData();
             GenerateRecentActivities();
@@ -605,7 +639,7 @@
             recentActivities.Add(new ActivityItem
             {
                 Title = $"New donation received",
-                Description = $"{donation.User?.Name ?? "Anonymous"} donated {FormatCurrency(donation.Amount)}",
+                Description = $"{(string.IsNullOrWhiteSpace(donation.DonorName) ? "Anonymous" : donation.DonorName)} donated {FormatCurrency(donation.Amount)}",
                 Time = GetTimeAgo(donation.CreatedDate),
                 DotColor = "bg-primary"
             });
